@@ -1,0 +1,13 @@
+<Project>
+  <PropertyGroup>
+    <Version>3.0.0-rc.3</Version>
+    <NuGetAudit>false</NuGetAudit>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(StableUpdatePublicKey)' != '' and '$(StableUpdateKeyId)' != ''">
+    <AssemblyMetadata Include="SMAP.StableUpdatePublicKey" Value="$(StableUpdatePublicKey)" />
+    <AssemblyMetadata Include="SMAP.StableUpdateKeyId" Value="$(StableUpdateKeyId)" />
+  </ItemGroup>
+  <Target Name="CheckStableTrustConfiguration" BeforeTargets="GenerateAssemblyInfo">
+    <Error Condition="('$(StableUpdatePublicKey)' == '' and '$(StableUpdateKeyId)' != '') or ('$(StableUpdatePublicKey)' != '' and '$(StableUpdateKeyId)' == '')" Text="StableUpdatePublicKey and StableUpdateKeyId must be provisioned together. Never pass a private key to MSBuild." />
+  </Target>
+</Project>

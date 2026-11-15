@@ -10,7 +10,6 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>Assets\app.ico</ApplicationIcon>
     <AssemblyName>SMAP-Setup</AssemblyName>
-    <Version>3.0.0-rc.2</Version>
     <AssemblyVersion>3.0.0.0</AssemblyVersion>
   </PropertyGroup>
 

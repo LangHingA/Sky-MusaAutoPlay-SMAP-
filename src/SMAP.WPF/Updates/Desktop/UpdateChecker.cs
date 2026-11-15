@@ -74,7 +74,8 @@ public static class UpdateChecker
     public static async Task<string> DownloadAsync(Release release, IProgress<double>? progress = null, CancellationToken cancellationToken = default)
         => await DownloadToAsync(release, DownloadHttp, Path.Combine(Path.GetTempPath(), "SMAP", "updates"), progress, cancellationToken);
 
-    internal static async Task<string> DownloadToAsync(Release release, HttpClient http, string dir, IProgress<double>? progress = null, CancellationToken cancellationToken = default)
+    internal static async Task<string> DownloadToAsync(Release release, HttpClient http, string dir, IProgress<double>? progress = null, CancellationToken cancellationToken = default,
+        IReadOnlyList<Updates.UpdateKey>? publisherKeys = null)
     {
         const long limit = 512L * 1024 * 1024;
         if (string.IsNullOrEmpty(release.Tag) || release.Tag.Length > 80 || release.Tag.Any(c => !char.IsAsciiLetterOrDigit(c) && c is not ('.' or '-'))
@@ -82,6 +83,22 @@ public static class UpdateChecker
             || source.Scheme != Uri.UriSchemeHttps || !source.Host.Equals("github.com", StringComparison.OrdinalIgnoreCase)
             || !source.AbsolutePath.StartsWith("/" + Repo + "/releases/download/", StringComparison.OrdinalIgnoreCase))
             throw new IOException("安装包地址或版本无效。");
+        var keys = publisherKeys ?? Updates.UpdateTrust.Keys;
+        if (!keys.Any(k => k.Channel == "stable")) throw new IOException("正式更新签名尚未配置。请从官方发布页面核对发行信息；不会自动执行未验证安装包。");
+        Updates.InstallerRelease proof;
+        try
+        {
+            var proofUri = new Uri($"https://github.com/{Repo}/releases/download/v{release.Tag}/SMAP-installer-manifest.json");
+            using var response = await DownloadResponse(http, proofUri, cancellationToken); response.EnsureSuccessStatusCode();
+            if (response.Content.Headers.ContentLength > Updates.InstallerReleaseProof.MaxProofBytes) throw new IOException("安装包签名信息过大。");
+            await using var input = await response.Content.ReadAsStreamAsync(cancellationToken); using var body = new MemoryStream(); var part = new byte[4096]; int count;
+            while ((count = await input.ReadAsync(part, cancellationToken)) > 0)
+            { if (body.Length + count > Updates.InstallerReleaseProof.MaxProofBytes) throw new IOException("安装包签名信息过大。"); body.Write(part, 0, count); }
+            proof = Updates.InstallerReleaseProof.Verify(body.ToArray(), keys, release.Tag);
+            if (release.AssetSize > 0 && release.AssetSize != proof.Size) throw new IOException("安装包发布信息不一致。");
+        }
+        catch (Exception error) when (error is InvalidDataException or JsonException or FormatException or System.Security.Cryptography.CryptographicException or InvalidOperationException)
+        { throw new IOException("无法验证安装包发布者或内容签名。", error); }
         Directory.CreateDirectory(dir);
         var path = Path.Combine(dir, $"SMAP-Setup-v{release.Tag}.exe");
         var partial = path + ".download";
@@ -110,6 +127,7 @@ public static class UpdateChecker
                 throw new IOException($"安装包大小不正确（应为 {release.AssetSize}，实际为 {received}）");
             using (var check = File.OpenRead(partial))
                 if (check.ReadByte() != 'M' || check.ReadByte() != 'Z') throw new IOException("下载文件不是有效的 Windows 安装程序。");
+            Updates.InstallerReleaseProof.VerifyFile(partial, proof);
             File.Move(partial, path, true);
             return path;
         }

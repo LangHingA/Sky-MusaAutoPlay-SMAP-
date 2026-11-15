@@ -110,7 +110,7 @@ public static class UpdateFormat
             if ((File.Exists(p) || Directory.Exists(p)) && (File.GetAttributes(p) & FileAttributes.ReparsePoint) != 0)
                 throw new InvalidDataException("Reparse links cannot be updated.");
     }
-    static void Unique(JsonElement value)
+    internal static void Unique(JsonElement value)
     {
         if (value.ValueKind == JsonValueKind.Object)
         {
