@@ -1,6 +1,6 @@
 # SMAP ? Sky Music AutoPlay
 
-[????](README.md) ? [Repository](https://github.com/langhinga/Sky-MusaAutoPlay-SMAP-)
+[简体中文](README.md) ? [Repository](https://github.com/langhinga/Sky-MusaAutoPlay-SMAP-)
 
 Developed by **LANGHINGA**. A Windows music project editor, preview, practice and automatic performance app built with C#, WPF and .NET 10.
 
@@ -53,7 +53,7 @@ Installer outputs: `_smap_publish/`, `Payload/app.zip`, `_setup_out/SMAP-Setup.e
 
 ## Source layout
 
-`src/SMAP.WPF/` groups Views, Controls, Core, Services, Updates, Localization, Themes and Assets. `Installer/`, `Updater/`, `Tests/` and `Tools/` have separate responsibilities. `docs/` contains documentation, `???/` preserves original scores, and `legacy/JavaFX/` archives the earlier implementation.
+`src/SMAP.WPF/` groups Views, Controls, Core, Services, Updates, Localization, Themes and Assets. `Installer/`, `Updater/`, `Tests/` and `Tools/` have separate responsibilities. `docs/` contains documentation, `曲谱库/` preserves original scores, and `legacy/JavaFX/` archives the earlier implementation.
 
 The reorganization does not change assembly identity, timeline semantics, cloud protocols or the `.smap` format.
 
