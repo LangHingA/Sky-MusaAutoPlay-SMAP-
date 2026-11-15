@@ -1,4 +1,4 @@
-using System.IO;
+﻿using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -212,5 +212,32 @@ public sealed class DeltaUpdateTests
         using (var altered = new FileStream(Path.Combine(f.Root, "SMAP.exe"), FileMode.Open, FileAccess.Write)) { altered.SetLength(1); }
         await Assert.ThrowsAnyAsync<IOException>(() => UpdatePlanning.Reconstruct(plan, cache, f.Temp.PathFor("stage"), null, default));
         Assert.Equal(1, new FileInfo(Path.Combine(f.Root, "SMAP.exe")).Length);
+    }
+
+    [Fact]
+    public void PortablePrivateDataNeverEntersAnUpdateInventory()
+    {
+        using var f = new Fixture();
+        Directory.CreateDirectory(Path.Combine(f.Source, "Data", "Settings"));
+        File.WriteAllText(Path.Combine(f.Source, "Data", "Settings", "session.dat"), "synthetic private");
+        File.WriteAllText(Path.Combine(f.Source, "portable.mode"), "explicit portable");
+        Directory.CreateDirectory(Path.Combine(f.Source, "Licenses")); File.WriteAllText(Path.Combine(f.Source, "Licenses", "LICENSE.txt"), "license");
+        var manifest = f.Build(); Assert.Contains(manifest.Files, p => p.Path == "Licenses/LICENSE.txt");
+        Assert.DoesNotContain(manifest.Files, p => p.Path.StartsWith("Data/") || p.Path == "portable.mode");
+        Assert.Throws<InvalidDataException>(() => UpdateFormat.ManagedPath("Data/Settings/session.dat"));
+    }
+    [Theory]
+    [InlineData("downgrade")][InlineData("corrupt")][InlineData("wrong-key")]
+    public void InvalidInstalledInventoryFailsBeforeWritingRecoveryOrCode(string reason)
+    {
+        using var f = new Fixture(); var previous = f.Build() with { Version = "9.0.0-alpha.1", Tag = "v9.0.0-alpha.1" };
+        byte[] old = f.Signed(previous);
+        if (reason == "corrupt") old = Encoding.UTF8.GetBytes("invalid installed inventory");
+        if (reason == "wrong-key") { using var other = ECDsa.Create(ECCurve.NamedCurves.nistP256); old = UpdateBuilder.Sign(previous, "synthetic", other); }
+        File.WriteAllBytes(Path.Combine(f.Root, UpdateTransaction.InstalledManifest), old);
+        byte[] original = File.ReadAllBytes(Path.Combine(f.Root, "SMAP.exe"));
+        Assert.ThrowsAny<Exception>(() => UpdateTransaction.Apply(f.Root, f.Source, f.Signed(f.Build()), f.Keys, "alpha", "v3.0.0-alpha.update.2"));
+        Assert.Equal(original, File.ReadAllBytes(Path.Combine(f.Root, "SMAP.exe")));
+        Assert.False(Directory.Exists(UpdateTransaction.RecoveryDirectory(f.Root)));
     }
 }

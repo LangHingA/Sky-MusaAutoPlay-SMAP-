@@ -9,5 +9,6 @@
   </ItemGroup>
   <Target Name="CheckStableTrustConfiguration" BeforeTargets="GenerateAssemblyInfo">
     <Error Condition="('$(StableUpdatePublicKey)' == '' and '$(StableUpdateKeyId)' != '') or ('$(StableUpdatePublicKey)' != '' and '$(StableUpdateKeyId)' == '')" Text="StableUpdatePublicKey and StableUpdateKeyId must be provisioned together. Never pass a private key to MSBuild." />
+    <Error Condition="'$(StableUpdatePublicKey)' != '' and !$([System.Text.RegularExpressions.Regex]::IsMatch('$(StableUpdatePublicKey)', '^MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE[A-Za-z0-9+/]{86}==$'))" Text="StableUpdatePublicKey must be a canonical P-256 PUBLIC SubjectPublicKeyInfo, never private key bytes." />
   </Target>
 </Project>

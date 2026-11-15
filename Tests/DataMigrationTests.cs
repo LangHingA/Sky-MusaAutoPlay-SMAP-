@@ -1,4 +1,4 @@
-using System.IO;
+﻿using System.IO;
 using System.Security.Cryptography;
 using System.Text.Json;
 using SMAP_WPF;
@@ -67,5 +67,18 @@ public sealed class DataMigrationTests
         var result = p.Prepare(); Assert.True(result.Complete); Assert.Equal(result.Files[0].Destination + "|88", File.ReadAllText(p.Setting("nowplaying.txt")));
         File.WriteAllText(result.Files[0].Destination, "user edited migrated song"); var resumed = p.Prepare(); Assert.Equal("user edited migrated song", File.ReadAllText(result.Files[0].Destination));
         Assert.Equal("original", File.ReadAllText(resumed.Files[0].Destination)); Assert.NotEqual(result.Files[0].Destination, resumed.Files[0].Destination);
+    }
+
+    [Fact]
+    public void SampleSeedingNeverReplacesAUserEditedFile()
+    {
+        using var temp = new TestProject(); var paths = Paths(temp);
+        string samples = Path.Combine(paths.Installation, "Assets", "Samples"); Directory.CreateDirectory(samples);
+        Directory.CreateDirectory(paths.Songs); File.WriteAllText(Path.Combine(paths.Songs, "same.txt"), "user edit");
+        File.WriteAllText(Path.Combine(samples, "same.txt"), "bundled sample"); File.WriteAllText(Path.Combine(samples, "new.txt"), "new sample");
+        paths.Prepare(); paths.Prepare();
+        Assert.Equal("user edit", File.ReadAllText(Path.Combine(paths.Songs, "same.txt")));
+        Assert.Equal("new sample", File.ReadAllText(Path.Combine(paths.Songs, "new.txt")));
+        Assert.Equal(2, Directory.GetFiles(paths.Songs).Length);
     }
 }

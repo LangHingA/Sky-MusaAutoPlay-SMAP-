@@ -1,4 +1,4 @@
-using System.IO;
+﻿using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -69,7 +69,8 @@ public static class UserDataMigration
         Directory.CreateDirectory(destination); Directory.CreateDirectory(profile);
         string work = Path.Combine(backups, "migration-" + Convert.ToHexStringLower(SHA256.HashData(Encoding.UTF8.GetBytes(source.ToUpperInvariant())))[..16]);
         RejectLinks(work); Directory.CreateDirectory(work);
-        using var migrationLock = new FileStream(Path.Combine(work, "migration.lock"), FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None);
+        string lockFile = Path.Combine(work, "migration.lock"); RejectLinks(lockFile);
+        using var migrationLock = new FileStream(lockFile, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None);
         string journal = Path.Combine(work, "manifest.json"), profileBackups = Path.Combine(work, "profile");
         var records = new List<MigratedFile>(); var map = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase); int step = 0;
         void Save(bool complete) => Atomic(journal, JsonSerializer.SerializeToUtf8Bytes(new DataMigrationResult(source, destination, records.ToArray(), complete)));
