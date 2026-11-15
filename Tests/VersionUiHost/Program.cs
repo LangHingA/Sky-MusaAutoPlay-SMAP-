@@ -1043,7 +1043,6 @@ static class Program
             main.Left+=17;main.Top+=9;Pump();Anchored();main.Width+=100;Pump();Anchored();
             for(int i=0;i<3;i++){Click();Pump();Check(!pill.IsOpen,"Pill did not close");Click();Pump();Check(pill.IsOpen,"Pill did not reopen");Anchored();}
             if(output!=null)Capture(main,Path.Combine(output,$"instrument-pill-{theme}-{language}.png"));
-            pill.Close(true);pill.ReduceMotion=false;Click();Pump();
             pill.Options.ScrollIntoView(pill.Options.Items[0]);Pump();
             var header=(FrameworkElement)pill.Template.FindName("PART_Header",pill);var option=(ListBoxItem)pill.Options.Items[0];
             var head=header.TranslatePoint(new Point(),pill);var label=option.TranslatePoint(new Point(),pill);int frames=0;
@@ -1054,7 +1053,12 @@ static class Program
                 Check(Math.Abs(t.X-label.X)<.1&&Math.Abs(t.Y-label.Y)<.1,"Pill option text bounced with the shell");
                 Check(pill.Chrome.Clip is StreamGeometry clip&&Math.Abs(clip.Bounds.Height-pill.Chrome.ActualHeight)<.1,"Pill animation lost clipping");frames++;
             };
-            pill.Chrome.SizeChanged+=sample;var clock=Stopwatch.StartNew();Until(()=>clock.ElapsedMilliseconds>=390);pill.Chrome.SizeChanged-=sample;
+            // Subscribe before starting the clock: two earlier Pump calls could consume the animation before observation.
+            pill.Close(true);pill.ReduceMotion=false;
+            pill.Chrome.SizeChanged+=sample;var clock=Stopwatch.StartNew();
+            try { Click();Until(()=>clock.ElapsedMilliseconds>=390); }
+            finally { pill.Chrome.SizeChanged-=sample; }
+            pill.UpdateLayout();Pump();
             if(SystemParameters.ClientAreaAnimation)Check(frames>=3,"Pill reveal did not animate");
             Click();Click();clock.Restart();Until(()=>clock.ElapsedMilliseconds>=390);Check(pill.IsOpen,"Stale close completion hid reopened pill");
             pill.ReduceMotion=true;pill.Close(true);Click();Pump();last=(ListBoxItem)pill.Options.Items[^1];pill.Options.ScrollIntoView(last);Pump();
