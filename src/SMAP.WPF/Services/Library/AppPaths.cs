@@ -12,13 +12,15 @@ public sealed class AppPaths
     public string Cache { get; }
     public string Updates { get; }
     public string Backups { get; }
+    readonly string _previousSongs;
     public string Instruments => Path.Combine(Installation, "Assets", "Instruments");
     public string Setting(string name) => Path.Combine(Settings, name);
     AppPaths(string installation, string local, string roaming, bool portable)
     {
         Installation = Path.GetFullPath(installation); Portable = portable;
         string data = portable ? Path.Combine(Installation, "Data") : Path.GetFullPath(local);
-        Songs = Path.Combine(data, "Songs"); Settings = portable ? Path.Combine(data, "Settings") : Path.GetFullPath(roaming);
+        Songs = Path.Combine(Installation, "Song"); _previousSongs = Path.Combine(data, "Songs");
+        Settings = portable ? Path.Combine(data, "Settings") : Path.GetFullPath(roaming);
         Cache = Path.Combine(data, "Cache"); Updates = Path.Combine(data, "Updates"); Backups = Path.Combine(data, "Backups");
     }
     public static AppPaths ForInstallation(string installation, string? local = null, string? roaming = null)
@@ -32,7 +34,11 @@ public sealed class AppPaths
     public DataMigrationResult Prepare(Action<int>? checkpoint = null)
     {
         foreach (string path in new[] { Songs, Settings, Cache, Updates, Backups }) { UserDataMigration.RejectLinks(path); Directory.CreateDirectory(path); }
-        var migration = UserDataMigration.Migrate(Path.Combine(Installation, "songs"), Songs, Settings, Backups, checkpoint);
+        var migrated = new List<MigratedFile>();
+        string legacy = Path.Combine(Installation, "songs");
+        foreach (string source in new[] { _previousSongs, legacy })
+            migrated.AddRange(UserDataMigration.Migrate(source, Songs, Settings, Backups, checkpoint).Files);
+        var migration = new DataMigrationResult(legacy, Songs, migrated.ToArray(), true);
         string samples = Path.Combine(Installation, "Assets", "Samples");
         if (Directory.Exists(samples))
             foreach (string file in Directory.EnumerateFiles(samples))

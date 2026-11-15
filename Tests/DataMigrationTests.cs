@@ -21,8 +21,22 @@ public sealed class DataMigrationTests
         Assert.False(AppPaths.ForInstallation(normal.Installation, temp.PathFor("Local"), temp.PathFor("Roaming")).Portable);
         File.WriteAllText(Path.Combine(normal.Installation, "portable.mode"), "SMAP portable");
         var portable = AppPaths.ForInstallation(normal.Installation, temp.PathFor("Local"), temp.PathFor("Roaming"));
-        Assert.True(portable.Portable); Assert.Equal(Path.Combine(normal.Installation, "Data", "Songs"), portable.Songs);
+        Assert.True(portable.Portable); Assert.Equal(Path.Combine(normal.Installation, "Song"), portable.Songs);
         Assert.Equal(Path.Combine(normal.Installation, "Data", "Settings"), portable.Settings);
+    }
+    [Fact]
+    public void DefaultSongFolderMigratesPreviousLocalStorageAndReferences()
+    {
+        using var temp = new TestProject(); var paths = Paths(temp);
+        Assert.Equal(Path.Combine(paths.Installation, "Song"), paths.Songs);
+        string old = Path.Combine(temp.PathFor("Local"), "Songs"); Directory.CreateDirectory(old);
+        string song = Path.Combine(old, "original.json"); File.WriteAllText(song, "{\"name\":\"old song\",\"unknown\":true}");
+        Directory.CreateDirectory(paths.Settings); File.WriteAllText(paths.Setting("playlist.txt"), song);
+        string hash = Hash(song); var result = paths.Prepare();
+        string next = Path.Combine(paths.Songs, "original.json");
+        Assert.Single(result.Files); Assert.Equal(hash, Hash(song)); Assert.Equal(hash, Hash(next));
+        Assert.Equal(next, File.ReadAllText(paths.Setting("playlist.txt")));
+        paths.Prepare(); Assert.Single(Directory.GetFiles(paths.Songs));
     }
     [Fact]
     public void LargeLibraryResumeIsIdempotentAndPreservesSourceAndConflicts()
