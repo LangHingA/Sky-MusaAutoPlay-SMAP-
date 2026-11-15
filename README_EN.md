@@ -1,120 +1,68 @@
-<div align="center">
+# SMAP ? Sky Music AutoPlay
 
-<img src="Assets/logo.png" width="140" alt="SMAP Logo" />
+[????](README.md) ? [Repository](https://github.com/langhinga/Sky-MusaAutoPlay-SMAP-)
 
-# SMAP · Sky-Musa Auto Play
+Developed by **LANGHINGA**. A Windows music project editor, preview, practice and automatic performance app built with C#, WPF and .NET 10.
 
-An auto-play (auto-piano) helper for **Sky: Children of the Light** — reimagined as a music player, in C# WPF.
+> Documentation draft for approval. This branch is the **v3.0.0-rc.3 maintenance candidate**, not a published v3.0 Stable release. Signing and final acceptance remain release gates.
 
-[简体中文](README.md) · [Download Releases](https://github.com/langhinga/Sky-MusaAutoPlay-SMAP-/releases) · [Old JavaFX build](JAVA%20version/)
+## Implemented in v3.0
 
-</div>
+- Native `.smap` projects, multiple tracks, Tap / Hold, tempo and meter changes, and continued editing.
+- Four import tabs: online SMAP, offline, TXT/JSON and MIDI.
+- Legacy conversion; metadata-only edits retain notes, key count, time units and unknown fields rather than rebuilding a 15-key score.
+- SVG/PNG professional score export and project recovery using the existing protocol.
+- Muse HTTPS sharing, immutable version codes, history and provenance, with server-side ownership checks.
+- Local / cloud libraries, covers, folders, playlists, preview, keyboard performance and practice.
+- Three themes, Simplified Chinese / Traditional Chinese / English / Japanese, and G2 controls.
+- Muse-managed announcements; settings-based update channel selection, background downloads and a restart prompt when ready.
+- Signed chunk-based updates and transactional recovery. Stable requires publisher-provisioned trust; unsigned installer downloads fail closed.
 
----
+**In-game score mapping remains deferred to v3.1 and is not enabled in the release candidate.**
 
-## Overview
+## Installation and data
 
-SMAP plays Sky's instruments for you: import or create a sheet, and it performs it in-game.
-The latest release is a **full C# WPF rewrite** with a **music-player UI** — an account + collections sidebar, a cover-art library in the middle, the virtual keys on the right, and a full-width player bar at the bottom, plus a play queue, an inline cloud library, and a settings view.
+Windows x64 publish packages include the .NET runtime. The Release app requests elevation for global game input; Debug does not. Automated tests do not establish real game or human listening acceptance.
 
-> 🍬 **v2.2 "YunYun"**: Practice now includes a **sheet wall, beat mode, and Game Practice** with an always-on-top window and global key listening while Sky has focus; global playback hotkeys have been redesigned; adds sheet-cover upload/display, website account avatars, and the new "Sunset Candy" theme; dropdowns and favorites gain nonlinear motion; updates can now download, install, and restart entirely in-app.
+The compact application directory contains `SMAP.exe`, `SMAP.Updater.exe`, `Assets/` and `Licenses/`. Regular user storage is separate:
 
-> 🎹 v2.1: introduced full-screen follow-along practice, demo playback, and playback/settings persistence.
+```text
+%LOCALAPPDATA%/SMAP/{Songs,Cache,Updates,Backups}/
+%APPDATA%/SMAP/  # existing settings, favorites and private sessions
+```
 
-> 🎵 v2.0: game instrument timbres filled out to **37** (incl. 27 original Sky sounds), per-instrument transpose, hold-to-sustain, and random-speed playback.
+Legacy `songs/` files are copied and SHA-256 checked. Known playlist/folder/resume references are remapped; originals remain and conflicts are not silently overwritten. Keep the old directory and backups until you verify the migration. Do not install the app into its user-data directory.
 
-> ⚠️ SMAP must **run as administrator** (required to simulate global key presses; it auto-requests UAC on launch).
+Portable mode requires an explicit `portable.mode` file next to the executable and stores data in `Data/`. An old `songs/` folder alone never selects portable mode. Existing regular-profile credentials are not automatically exported into a new portable profile.
 
-## Screenshots
+Updates exclude Songs, Data, credentials and `portable.mode`. Recognized obsolete runtime files are archived only when exact hashes match; modified or unknown files remain. Application rollback never restores an old snapshot of personal data.
 
-| Dark · Local library (Chinese) | Light · Cloud library (English) |
-|:---:|:---:|
-| ![Dark](docs/screenshots/dark_zh.png) | ![Light](docs/screenshots/light_en.png) |
-| **Traditional Chinese · Settings** | **Japanese · Play queue** |
-| ![TW](docs/screenshots/light_tw.png) | ![JA](docs/screenshots/dark_ja.png) |
+## Build and test
 
-## Features
+Use **.NET SDK 10.0.403** from [global.json](global.json) on Windows with desktop development support:
 
-### Playback
-- **Auto-play** — simulates global key presses along the sheet timeline (uses scan codes + a short hold, so per-frame game polling doesn't miss notes).
-- **Perform / Preview toggle** — the bottom-right switch: **preview by default** (speaker, won't touch the game), lit = **perform** (sends game keys).
-- **Player bar** — cover / title·artist·transcriber / favorite star / shuffle·prev·play·next·queue / perform mode / cave reverb / instrument / pitch (transpose) / speed (incl. random).
-- **Progress bar** — a full-width thin line pinned to the container's top edge; on hover it thickens and shows a white handle + a time pill that track the play position in real time. Drag to seek, even while paused.
-- **Play queue** — a slide-out queue on the right; double-click a library song to enqueue and play; three modes (repeat-all / repeat-one / shuffle); auto-advance to the next track after a **2-second gap**.
-- **Remembers last state** — on exit it keeps the last played song + position; reopen to see it and resume from there; instrument / cave / perform mode / speed are remembered too.
-- **Live speed control** + **global hotkeys**: F1 restart/stop · F2 pause/resume · F3/F4 speed −/+0.1x · F5/F6 previous/next track · `←`/`→` seek −/+2 seconds.
+```powershell
+dotnet build SMAP.slnx -c Debug
+dotnet build SMAP.slnx -c Release
+dotnet test Tests/SMAP.Tests.csproj -c Debug
+dotnet test Tests/SMAP.Tests.csproj -c Release
+./Installer/build-installer.ps1 -Dotnet 'C:/Program Files/dotnet/dotnet.exe' -OutputRoot 'C:/SMAP-build'
+```
 
-### Practice (follow-along)
-- **Full-screen keyboard** — click "Practice" on the main screen; the keys zoom out of their original spot into a full-screen keyboard (springy, interruptible animation); `Esc` returns.
-- **Follow-along hints** — highlights the next key (accent) + the next-next key (dimmed); you only advance by pressing the current key, and **chords must be held together**.
-- **Demo playback** — press play to demo the whole song: sound via speaker + highlights leading the sound by one step; it **never sends game keys** in practice.
-- **Sheet wall & beat mode** — a 4×8 miniature sheet follows the current step, flips pages automatically, and can advance at a configurable beat rate.
-- **Game Practice** — keeps SMAP on top and listens globally for the 15 instrument keys, so follow-along continues while Sky has focus without consuming the game's input.
-- **Practice hotkeys** — F1 restarts at the first cell, F2 pauses/resumes, F3/F4 change speed, F5/F6 switch songs, and `←`/`→` jump one playable cell.
+Installer outputs: `_smap_publish/`, `Payload/app.zip`, `_setup_out/SMAP-Setup.exe`. Do not commit generated output.
 
-### Library & Collections
-- **Local library** — rich rows with cover art (title / artist / transcriber / duration); hover reveals add-to-queue / favorite / more; right-click menu with 7 actions (add to queue / add to collection / remove from library / open file location / edit / song info / upload).
-- **My Collections (playlists)** — create / rename / delete / **drag to reorder** (with a drop indicator); the ⭐ star means "saved in any collection" (music-player style).
-- **Inline cloud library** — browse the MuseTreehouse online library right in the middle pane, with **infinite scroll**, sort (newest / hottest / downloads) + difficulty filter, one-click download, and sheet-cover upload/display.
-- **Import** — `.json` / `.txt` / `.mid` (MIDI is auto-transposed to C major).
+## Source layout
 
-### Authoring & Sound
-- **Piano-roll editor** — type notes on the keyboard, triplet grid, undo/redo.
-- **Cave reverb** — recreates Sky's cave acoustics.
-- **Instruments** — **37 of them**, including 27 original Sky timbres extracted from the game (Violin / Cello / Saxophone / Ocarina / Harmonica / Pipa / Glockenspiel / Handpan / Horn / Piccolo… etc.), names localized per language.
-- **Per-instrument transpose** — independent pitch offset per instrument (12 semitones + octaves), saved locally; low instruments default to their in-game register, one-click reset.
-- **Hold to sustain** — wind / bowed-string instruments sound continuously while a key is held.
+`src/SMAP.WPF/` groups Views, Controls, Core, Services, Updates, Localization, Themes and Assets. `Installer/`, `Updater/`, `Tests/` and `Tools/` have separate responsibilities. `docs/` contains documentation, `???/` preserves original scores, and `legacy/JavaFX/` archives the earlier implementation.
 
-### UI & Settings
-- **Custom rounded window** + **live Dark / Light / Sunset Candy themes** + **Sky-style diamond keys** (with a flip animation on trigger).
-- **Website account profile** — shows the MuseTreehouse avatar directly in the sidebar card and profile window.
-- **Polished motion** — interruptible nonlinear animations for filter/sort popups, favorite stars, and practice transitions.
-- **Languages** — Simplified Chinese / Traditional Chinese / English / Japanese.
-- **Settings view** (slides in from the middle/right panels) — language / theme / check updates / upload logs / UI scale / font scale / start countdown / key mapping.
-- **Auto-requests admin** on launch + **automatic update check**; new versions download, install, and restart in-app.
+The reorganization does not change assembly identity, timeline semantics, cloud protocols or the `.smap` format.
 
-## Shortcuts
+## Release trust
 
-**Global hotkeys** (work in-game too):
+Alpha and Stable require separate signing identities. Never put private keys in Git, MSBuild properties or packages. Stable builds accept an approved P-256 public key and KeyId; signing tools must match that identity. Full installers require signed publisher metadata plus an exact SHA-256 check, not merely HTTPS, size or an MZ header.
 
-| Key | Action | Key | Action |
-|---|---|---|---|
-| `F1` | Restart / Stop | `F2` | Pause / Resume |
-| `F3` | Speed −0.1x | `F4` | Speed +0.1x |
-| `F5` | Previous track | `F6` | Next track |
-| `←` | Back 2 seconds | `→` | Forward 2 seconds |
-
-**Virtual keys** (15 keys, remappable in Settings):
-
-| Register | Keys |
-|---|---|
-| High | `Y` `U` `I` `O` `P` |
-| Mid | `H` `J` `K` `L` `;` |
-| Low | `N` `M` `,` `.` `/` |
-
-> Wind / bowed-string instruments sustain while you hold a key.
-
-## Install / Use
-
-1. Download the latest **SMAP-Setup.exe** from [Releases](https://github.com/langhinga/Sky-MusaAutoPlay-SMAP-/releases).
-2. Run it (it requests admin rights), pick an install path in the wizard; desktop / Start-menu shortcuts are created automatically.
-3. Take out an instrument in-game → double-click a song in SMAP to enqueue → press the bottom ▶ or `F1` in-game.
-
-> Sheets live in the `songs` folder next to the app (created on first import / download).
-> For a bulk sheet library, see the [`曲谱库/`](曲谱库/) folder in this repo.
-
-## Build from source
-
-Requires the [.NET 9 SDK](https://dotnet.microsoft.com/download).
-
-    dotnet build -c Release
-
-Installer packaging lives in [`Installer/`](Installer/) (`build-installer.ps1`).
-
-## Old JavaFX build
-
-No longer maintained; source in [`JAVA version/`](JAVA%20version/).
+This candidate has no provisioned production Stable key and makes no Authenticode certificate claim. Signing, real UAC/game/listening checks and final release approval remain pending. See the [release notes draft](docs/RELEASE-NOTES-v3.0-DRAFT.md).
 
 ## License
 
-See [LICENSE](LICENSE). For study/hobby use; sheet copyrights belong to their transcribers.
+See [LICENSE](LICENSE) and [third-party notices](docs/ThirdPartyNotices.txt). Respect score ownership and applicable platform rules.
