@@ -81,4 +81,18 @@ public sealed class DataMigrationTests
         Assert.Equal("new sample", File.ReadAllText(Path.Combine(paths.Songs, "new.txt")));
         Assert.Equal(2, Directory.GetFiles(paths.Songs).Length);
     }
+
+    [Fact]
+    public void DestinationJunctionIsRejectedWithoutWritingOutsideTheDataRoot()
+    {
+        using var temp = new TestProject(); var paths = Paths(temp);
+        string source = Path.Combine(paths.Installation, "songs"); Directory.CreateDirectory(Path.Combine(source, "nested"));
+        File.WriteAllText(Path.Combine(source, "nested", "private.txt"), "source content");
+        Directory.CreateDirectory(paths.Songs); string outside = temp.PathFor("outside"); Directory.CreateDirectory(outside);
+        string link = Path.Combine(paths.Songs, "nested");
+        using var process = System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("cmd.exe", $"/d /c mklink /J \"{link}\" \"{outside}\"") { UseShellExecute = false, CreateNoWindow = true, RedirectStandardOutput = true, RedirectStandardError = true })!;
+        process.WaitForExit(); Assert.Equal(0, process.ExitCode);
+        try { Assert.Throws<IOException>(() => paths.Prepare()); Assert.Empty(Directory.GetFiles(outside)); Assert.True(File.Exists(Path.Combine(source,"nested","private.txt"))); }
+        finally { Directory.Delete(link); }
+    }
 }
