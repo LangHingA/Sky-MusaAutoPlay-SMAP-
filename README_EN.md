@@ -19,7 +19,7 @@ Developed by **LANGHINGA**. This delivery is **v3.0.0 Stable**. Release artifact
 SMAP plays Sky's instruments for you: import or create a sheet, and it performs it in-game.
 The latest release is a **full C# WPF rewrite** with a **music-player UI** — an account + collections sidebar, a cover-art library in the middle, the virtual keys on the right, and a full-width player bar at the bottom, plus a play queue, an inline cloud library, and a settings view.
 
-> 🎼 **v3.0.0**: native `.smap` multi-track projects, Tap/Hold, tempo and meter changes, four import tabs, Muse versioned sharing, image-score recovery, announcements and signed background differential updates. Legacy migration keeps original files; personal data is separate from the program.
+> 🎼 **v3.0.0**: native `.smap` multi-track projects, Tap/Hold, tempo and meter changes, four import tabs, Muse versioned sharing, image-score recovery, announcements and signed background differential updates. Legacy migration keeps original files; songs are grouped in `Song/` beside the program.
 
 > 🍬 **v2.2 "YunYun"**: Practice now includes a **sheet wall, beat mode, and Game Practice** with an always-on-top window and global key listening while Sky has focus; global playback hotkeys have been redesigned; adds sheet-cover upload/display, website account avatars, and the new "Sunset Candy" theme; dropdowns and favorites gain nonlinear motion; updates can now download, install, and restart entirely in-app.
 
@@ -111,14 +111,14 @@ The original screenshots are retained to show the visual style. Import, sharing 
 2. Run it (it requests admin rights), pick an install path in the wizard; desktop / Start-menu shortcuts are created automatically.
 3. Take out an instrument in-game → double-click a song in SMAP to enqueue → press the bottom ▶ or `F1` in-game.
 
-> Regular installations store songs in `%LOCALAPPDATA%/SMAP/Songs/`. Existing settings, favorites and private sessions remain in `%APPDATA%/SMAP/`.
+> Downloaded and imported songs default to `Song/` beside the program. This version does not offer a storage-location setting. Existing settings, favorites and private sessions remain in `%APPDATA%/SMAP/`.
 > For a bulk sheet library, see the [`曲谱库/`](曲谱库/) folder in this repo.
 
-Legacy `songs/` migration copies files, verifies SHA-256 and remaps known references. Originals remain, and name conflicts are not silently overwritten. Verify songs, favorites and sharing associations before cleaning old directories. Do not install into the personal-data directory itself.
+Migration from legacy `songs/` and the previous `%LOCALAPPDATA%/SMAP/Songs/` location copies files, verifies SHA-256 and remaps known references. Originals remain, and name conflicts are not silently overwritten. Verify songs, favorites and sharing associations before cleaning old directories. Do not install into the personal-data directory itself.
 
-Portable mode requires an explicit `portable.mode` file next to the program and stores personal data in `Data/`. An old `songs/` directory alone never enables it; regular-profile credentials are not automatically exported.
+Portable mode requires an explicit `portable.mode` file next to the program and stores settings, caches and update staging in `Data/`; songs remain in `Song/` beside the program. An old `songs/` directory alone never enables it; regular-profile credentials are not automatically exported.
 
-The compact program directory primarily contains `SMAP.exe`, `SMAP.Updater.exe`, `Assets/`, `Licenses/` and a signed installed manifest. Caches, update staging and backups live under `%LOCALAPPDATA%/SMAP/`. Updates preserve personal songs and settings; program rollback does not roll back user data.
+The compact program directory primarily contains `SMAP.exe`, `SMAP.Updater.exe`, `Assets/`, `Licenses/`, the user library `Song/` and a signed installed manifest. Caches, update staging and backups live under `%LOCALAPPDATA%/SMAP/`. Updates preserve personal songs and settings; program rollback does not roll back user data.
 
 ## Build from source
 
@@ -134,7 +134,7 @@ dotnet test Tests/SMAP.Tests.csproj -c Release
 
 The main project is in `src/SMAP.WPF/`, grouped into Views, Controls, Core, Services and Updates. `Installer/`, `Updater/`, `Tests/` and `Tools/` have separate responsibilities. Packaging produces `_smap_publish/`, `Payload/app.zip` and `_setup_out/SMAP-Setup.exe`; Windows x64 installers include the runtime.
 
-Build and isolated-test temporary storage must stay within **5 GB (5,000,000,000 bytes) combined**. Set `SMAP_BUILD_SCRATCH_ROOT` to one C-drive scratch directory and run `Tools/CheckBuildStorage.ps1` with a reservation for the next operation. Installer packaging checks this budget. Never delete user data or recovery backups to make room.
+Build and isolated-test temporary storage must stay within **5 GB (5,000,000,000 bytes) combined**. Set `SMAP_BUILD_SCRATCH_ROOT` to one F-drive development scratch directory and run `Tools/CheckBuildStorage.ps1` with a reservation for the next operation. Installer packaging checks this budget. Never delete user data or recovery backups to make room.
 
 ## Update and release trust
 
