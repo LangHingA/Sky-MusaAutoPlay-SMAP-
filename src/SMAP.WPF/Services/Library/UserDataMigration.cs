@@ -55,6 +55,7 @@ public static class UserDataMigration
         string old = LinkPath(profile, source), next = LinkPath(profile, destination);
         if (!File.Exists(old) || !File.Exists(next)) return false;
         RejectLinks(old); RejectLinks(next);
+        if (new FileInfo(old).Length > 16384 || new FileInfo(next).Length > 16384) throw new IOException("分享关联过大，需要人工核对。");
         var a = JsonNode.Parse(File.ReadAllText(old))!.AsObject(); var b = JsonNode.Parse(File.ReadAllText(next))!.AsObject();
         a["localFile"] = destination; return !JsonNode.DeepEquals(a, b);
     }
@@ -68,6 +69,7 @@ public static class UserDataMigration
         Directory.CreateDirectory(destination); Directory.CreateDirectory(profile);
         string work = Path.Combine(backups, "migration-" + Convert.ToHexStringLower(SHA256.HashData(Encoding.UTF8.GetBytes(source.ToUpperInvariant())))[..16]);
         RejectLinks(work); Directory.CreateDirectory(work);
+        using var migrationLock = new FileStream(Path.Combine(work, "migration.lock"), FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None);
         string journal = Path.Combine(work, "manifest.json"), profileBackups = Path.Combine(work, "profile");
         var records = new List<MigratedFile>(); var map = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase); int step = 0;
         void Save(bool complete) => Atomic(journal, JsonSerializer.SerializeToUtf8Bytes(new DataMigrationResult(source, destination, records.ToArray(), complete)));
@@ -102,22 +104,27 @@ public static class UserDataMigration
             map[file] = target; records.Add(new(file, target, size, digest)); if (records.Count % 32 == 0) Save(false); checkpoint?.Invoke(++step);
         }
         string Mapped(string value) => map.GetValueOrDefault(value, value);
+        bool nodeChanged = false;
         void RewriteNode(JsonNode? node)
         {
             if (node is JsonObject obj)
                 foreach (string key in obj.Select(x => x.Key).ToArray())
-                { if (obj[key] is JsonValue value && value.TryGetValue<string>(out var text) && map.TryGetValue(text, out var replacement)) obj[key] = replacement; else RewriteNode(obj[key]); }
+                { if (obj[key] is JsonValue value && value.TryGetValue<string>(out var text) && map.TryGetValue(text, out var replacement)) { obj[key] = replacement; nodeChanged = true; } else RewriteNode(obj[key]); }
             else if (node is JsonArray array)
                 for (int index = 0; index < array.Count; index++)
-                { if (array[index] is JsonValue value && value.TryGetValue<string>(out var text) && map.TryGetValue(text, out var replacement)) array[index] = replacement; else RewriteNode(array[index]); }
+                { if (array[index] is JsonValue value && value.TryGetValue<string>(out var text) && map.TryGetValue(text, out var replacement)) { array[index] = replacement; nodeChanged = true; } else RewriteNode(array[index]); }
         }
         foreach (string name in new[] { "folders.json", "playlist.txt", "nowplaying.txt" })
         {
             string path = Path.Combine(profile, name); if (!File.Exists(path)) continue; RejectLinks(path);
             if (new FileInfo(path).Length > 16 * 1024 * 1024) throw new IOException("配置过大，需要人工核对；原文件保留。");
             byte[] original = File.ReadAllBytes(path); string text = File.ReadAllText(path), rewritten;
-            if (name.EndsWith(".json")) { var node = JsonNode.Parse(text); RewriteNode(node); rewritten = node!.ToJsonString(); }
-            else if (name == "playlist.txt") rewritten = string.Join(Environment.NewLine, File.ReadAllLines(path).Select(Mapped));
+            if (name.EndsWith(".json")) { var node = JsonNode.Parse(text); nodeChanged = false; RewriteNode(node); rewritten = nodeChanged ? node!.ToJsonString() : text; }
+            else if (name == "playlist.txt")
+            {
+                string[] lines = File.ReadAllLines(path), mapped = lines.Select(Mapped).ToArray();
+                rewritten = lines.SequenceEqual(mapped) ? text : string.Join(Environment.NewLine, mapped) + (text.EndsWith('\n') ? Environment.NewLine : "");
+            }
             else { int separator = text.LastIndexOf('|'); rewritten = separator >= 0 ? Mapped(text[..separator]) + text[separator..] : text; }
             if (rewritten != text)
             {

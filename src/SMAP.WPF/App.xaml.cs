@@ -21,7 +21,7 @@ public partial class App : Application
             Shutdown(); return;
         }
         try { await Task.Run(() => AppPaths.Current.Prepare()); }
-        catch (Exception error) when (error is System.IO.IOException or UnauthorizedAccessException or System.Text.Json.JsonException)
+        catch (Exception error) when (error is System.IO.IOException or System.IO.InvalidDataException or UnauthorizedAccessException or System.Text.Json.JsonException or InvalidOperationException or FormatException)
         {
             MessageBox.Show("数据迁移未完成，原文件和配置备份已保留。请核对后重试。\n" + error.Message, "SMAP");
             Shutdown(); return;
