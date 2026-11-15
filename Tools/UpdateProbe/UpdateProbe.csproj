@@ -6,5 +6,5 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
-  <ItemGroup><Compile Include="../../Updates/*.cs" LinkBase="Updates" /></ItemGroup>
+  <ItemGroup><Compile Include="../../src/SMAP.WPF/Updates/*.cs" LinkBase="Updates" /></ItemGroup>
 </Project>

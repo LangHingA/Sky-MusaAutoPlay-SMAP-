@@ -15,8 +15,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="..\G2Geometry.cs" Link="G2Geometry.cs" />
-    <Compile Include="..\G2Border.cs" Link="G2Border.cs" />
+    <Compile Include="..\src\SMAP.WPF\Controls\G2Geometry.cs" Link="G2Geometry.cs" />
+    <Compile Include="..\src\SMAP.WPF\Controls\G2Border.cs" Link="G2Border.cs" />
     <Resource Include="Assets\logo.png" />
   </ItemGroup>
 

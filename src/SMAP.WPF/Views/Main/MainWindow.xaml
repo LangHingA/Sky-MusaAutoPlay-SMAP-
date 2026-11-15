@@ -8,7 +8,7 @@
         ResizeMode="CanResizeWithGrip" WindowStartupLocation="CenterScreen">
     <Window.Resources>
         <ResourceDictionary>
-        <ResourceDictionary.MergedDictionaries><ResourceDictionary Source="ChoicePopupStyles.xaml"/></ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary.MergedDictionaries><ResourceDictionary Source="/SMAP;component/Controls/ChoicePopupStyles.xaml"/></ResourceDictionary.MergedDictionaries>
         <!-- ===== 极简扁平图标 (Feather/Lucide 风格, 24x24) ===== -->
         <PathGeometry x:Key="IconPrev" Figures="M20 5 L20 19 L9 12 Z M4 5 L7 5 L7 19 L4 19 Z"/>
         <PathGeometry x:Key="IconNext" Figures="M4 5 L4 19 L15 12 Z M17 5 L20 5 L20 19 L17 19 Z"/>

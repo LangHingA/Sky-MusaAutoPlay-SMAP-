@@ -7,7 +7,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <AssemblyName>SMAP.VersionTests</AssemblyName>
-    <ApplicationManifest>../../app.debug.manifest</ApplicationManifest>
+    <ApplicationManifest>../../src/SMAP.WPF/app.debug.manifest</ApplicationManifest>
   </PropertyGroup>
-  <ItemGroup><ProjectReference Include="../../SMAP-WPF.csproj"/><Resource Include="../../Assets/logo.png" Link="Assets/logo.png"/></ItemGroup>
+  <ItemGroup><ProjectReference Include="../../src/SMAP.WPF/SMAP-WPF.csproj"/><Resource Include="../../src/SMAP.WPF/Assets/logo.png" Link="Assets/logo.png"/></ItemGroup>
 </Project>

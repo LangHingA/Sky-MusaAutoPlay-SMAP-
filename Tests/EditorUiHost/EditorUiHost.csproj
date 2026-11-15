@@ -7,10 +7,10 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <AssemblyName>SMAP.EditorTests</AssemblyName>
-    <ApplicationManifest>../../app.debug.manifest</ApplicationManifest>
+    <ApplicationManifest>../../src/SMAP.WPF/app.debug.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="../../SMAP-WPF.csproj"/>
+    <ProjectReference Include="../../src/SMAP.WPF/SMAP-WPF.csproj"/>
     <Compile Include="../MidiFixture.cs" Link="MidiFixture.cs"/>
   </ItemGroup>
 </Project>

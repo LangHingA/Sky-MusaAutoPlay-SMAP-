@@ -20,6 +20,6 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <ProjectReference Include="..\SMAP-WPF.csproj" />
+    <ProjectReference Include="..\src\SMAP.WPF\SMAP-WPF.csproj" />
   </ItemGroup>
 </Project>

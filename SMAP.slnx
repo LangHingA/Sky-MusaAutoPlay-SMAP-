@@ -1,0 +1,23 @@
+<Solution>
+  <Folder Name="/Installer/">
+    <Project Path="Installer/SMAP-Installer.csproj" />
+  </Folder>
+  <Folder Name="/src/" />
+  <Folder Name="/src/SMAP.WPF/">
+    <Project Path="src/SMAP.WPF/SMAP-WPF.csproj" />
+  </Folder>
+  <Folder Name="/Tests/">
+    <Project Path="Tests/EditorUiHost/EditorUiHost.csproj" />
+    <Project Path="Tests/MappingUiHost/MappingUiHost.csproj" />
+    <Project Path="Tests/SharingHost/SharingHost.csproj" />
+    <Project Path="Tests/SMAP.Tests.csproj" />
+    <Project Path="Tests/VersionUiHost/VersionUiHost.csproj" />
+  </Folder>
+  <Folder Name="/Tools/">
+    <Project Path="Tools/UpdatePack/UpdatePack.csproj" />
+    <Project Path="Tools/UpdateProbe/UpdateProbe.csproj" />
+  </Folder>
+  <Folder Name="/Updater/">
+    <Project Path="Updater/SMAP.Updater.csproj" />
+  </Folder>
+</Solution>

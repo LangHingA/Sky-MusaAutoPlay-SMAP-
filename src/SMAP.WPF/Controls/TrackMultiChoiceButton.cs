@@ -50,7 +50,7 @@ public sealed class TrackMultiChoiceButton : JoinedChoiceButton
             button.Click += (_, e) => { SelectAll(pair.Item2); e.Handled = true; }; commands.Children.Add(button);
         }
         _count.HorizontalAlignment = HorizontalAlignment.Right; _count.SetResourceReference(TextBlock.ForegroundProperty, "SubTextFg"); commands.Children.Add(_count); _body.Children.Add(commands);
-        var resources = new ResourceDictionary { Source = new Uri("/SMAP;component/ChoicePopupStyles.xaml", UriKind.Relative) };
+        var resources = new ResourceDictionary { Source = new Uri("/SMAP;component/Controls/ChoicePopupStyles.xaml", UriKind.Relative) };
         var itemStyle = new Style(typeof(ListBoxItem), (Style)resources["PopupOptionItem"]);
         itemStyle.Setters.Add(new Setter(ListBoxItem.IsSelectedProperty, new Binding(nameof(TrackChoice.IsSelected)) { Mode = BindingMode.TwoWay }));
         var list = new ListBox { ItemsSource = _view, MaxHeight = 220, MinHeight = 36, SelectionMode = SelectionMode.Multiple, Background = Brushes.Transparent, BorderThickness = new Thickness(0), ItemContainerStyle = itemStyle };

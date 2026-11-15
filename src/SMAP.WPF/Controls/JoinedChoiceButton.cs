@@ -24,7 +24,7 @@ public class JoinedChoiceButton : Button
     public ListBox Options {get{ApplyTemplate();return _options;}}
     public JoinedChoiceButton()
     {
-        var resources=new ResourceDictionary{Source=new Uri("/SMAP;component/ChoicePopupStyles.xaml",UriKind.Relative)};
+        var resources=new ResourceDictionary{Source=new Uri("/SMAP;component/Controls/ChoicePopupStyles.xaml",UriKind.Relative)};
         Style=(Style)resources["JoinedChoiceButtonStyle"];
         SizeChanged+=(_,_)=>{if(_chrome!=null){_header.Height=Math.Max(0,ActualHeight-2);if(!IsOpen)_chrome.Height=ActualHeight;}};
         Unloaded+=(_,_)=>Close(true);

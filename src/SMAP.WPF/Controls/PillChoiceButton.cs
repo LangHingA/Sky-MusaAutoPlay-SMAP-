@@ -21,7 +21,7 @@ public sealed class PillChoiceButton : Button
     public ListBox Options {get{ApplyTemplate();return _options;}}
     public PillChoiceButton()
     {
-        var resources=new ResourceDictionary{Source=new Uri("/SMAP;component/ChoicePopupStyles.xaml",UriKind.Relative)};
+        var resources=new ResourceDictionary{Source=new Uri("/SMAP;component/Controls/ChoicePopupStyles.xaml",UriKind.Relative)};
         Style=(Style)resources["PillChoiceButtonStyle"];
         SizeChanged+=(_,_)=>{if(_chrome!=null&&!IsOpen)ResetSize();};
         Unloaded+=(_,_)=>Close(true);

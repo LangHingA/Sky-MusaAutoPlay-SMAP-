@@ -32,7 +32,7 @@ public sealed class CommandMenuButton : Button
 
     public CommandMenuButton()
     {
-        var resources=new ResourceDictionary { Source=new Uri("/SMAP;component/ChoicePopupStyles.xaml",UriKind.Relative) };
+        var resources=new ResourceDictionary { Source=new Uri("/SMAP;component/Controls/ChoicePopupStyles.xaml",UriKind.Relative) };
         Resources.MergedDictionaries.Add(resources); Style=(Style)resources["CommandMenuButtonStyle"];
         ContextMenuService.SetIsEnabled(this,false);
         SizeChanged+=(_,_)=> { if(_chrome!=null&&!IsOpen)ResetSize(); };

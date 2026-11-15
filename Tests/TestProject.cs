@@ -59,7 +59,7 @@ internal sealed class TestProject : IDisposable
     public static string FindRepository()
     {
         var directory = new DirectoryInfo(AppContext.BaseDirectory);
-        while (directory != null && !File.Exists(Path.Combine(directory.FullName, "SMAP-WPF.csproj"))) directory = directory.Parent;
+        while (directory != null && !File.Exists(Path.Combine(directory.FullName, "SMAP.slnx"))) directory = directory.Parent;
         return directory?.FullName ?? throw new DirectoryNotFoundException("找不到测试仓库。");
     }
 
