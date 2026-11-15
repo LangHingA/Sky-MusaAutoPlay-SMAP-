@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -48,7 +48,7 @@ public class VersionUiIntegrationTests(ITestOutputHelper output)
     public async Task ProductionEntryAndLifecycleBoundariesPassInActualWpf(string mode,string expected)
     {
         var start=new ProcessStartInfo("dotnet"){WorkingDirectory=TestProject.FindRepository(),UseShellExecute=false,CreateNoWindow=true,RedirectStandardOutput=true,RedirectStandardError=true};
-        string configuration=AppContext.BaseDirectory.Contains("Release")?"Release":"Debug";
+        string configuration=AppContext.BaseDirectory.Contains(Path.DirectorySeparatorChar + "Release" + Path.DirectorySeparatorChar)?"Release":"Debug";
         foreach(string arg in new[]{"run","--project","Tests/VersionUiHost/VersionUiHost.csproj","-c",configuration,"--",mode})start.ArgumentList.Add(arg);
         using var process=Process.Start(start)!;var stdout=process.StandardOutput.ReadToEndAsync();var stderr=process.StandardError.ReadToEndAsync();
         using var timeout=new CancellationTokenSource(TimeSpan.FromSeconds(120));

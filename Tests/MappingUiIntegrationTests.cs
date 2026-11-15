@@ -1,3 +1,4 @@
+﻿using System.IO;
 using System.Diagnostics;
 using Xunit;
 using Xunit.Abstractions;
@@ -27,7 +28,7 @@ public class MappingUiIntegrationTests(ITestOutputHelper output)
     async Task<string> Run(string mode)
     {
         var start=new ProcessStartInfo("dotnet"){WorkingDirectory=TestProject.FindRepository(),UseShellExecute=false,CreateNoWindow=true,RedirectStandardOutput=true,RedirectStandardError=true};
-        string configuration=AppContext.BaseDirectory.Contains("Release")?"Release":"Debug";
+        string configuration=AppContext.BaseDirectory.Contains(Path.DirectorySeparatorChar + "Release" + Path.DirectorySeparatorChar)?"Release":"Debug";
         foreach(string arg in new[]{"run","--project","Tests/MappingUiHost/MappingUiHost.csproj","-c",configuration,"--",mode})start.ArgumentList.Add(arg);
         using var process=Process.Start(start)!;var stdout=process.StandardOutput.ReadToEndAsync();var stderr=process.StandardError.ReadToEndAsync();
         using var timeout=new CancellationTokenSource(TimeSpan.FromSeconds(120));
