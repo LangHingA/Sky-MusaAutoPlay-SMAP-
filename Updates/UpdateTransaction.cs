@@ -30,6 +30,19 @@ public static class UpdateTransaction
     {
         var manifest = UpdateFormat.Verify(signed, keys, channel, tag); root = Path.GetFullPath(root).TrimEnd(Path.DirectorySeparatorChar);
         if (!File.Exists(UpdateFormat.Under(root, "SMAP.exe"))) throw new InvalidDataException("Existing SMAP installation required.");
+        string installed = Target(root, InstalledManifest);
+        UpdateManifest? prior = null;
+        if (File.Exists(installed))
+        {
+            if (new FileInfo(installed).Length > UpdateFormat.MaxManifestBytes) throw new InvalidDataException("Installed manifest too large.");
+            byte[] old = File.ReadAllBytes(installed);
+            using var envelope = JsonDocument.Parse(old); var e = envelope.Deserialize<SignedUpdate>(UpdateFormat.Json)!;
+            using var payload = JsonDocument.Parse(Convert.FromBase64String(e.Payload));
+            string oldTag = payload.RootElement.GetProperty("tag").GetString()!;
+            string oldChannel = payload.RootElement.GetProperty("channel").GetString()!;
+            prior = UpdateFormat.Verify(old, keys, oldChannel, oldTag);
+            if (UpdateVersions.Compare(manifest.Version, prior.Version) < 0) throw new InvalidDataException("Update downgrade refused.");
+        }
         UpdateFormat.RejectLinks(staging); string recovery = RecoveryDirectory(root); UpdateFormat.RejectLinks(recovery);
         Directory.CreateDirectory(recovery);
         UpdateFormat.RejectLinks(Path.Combine(root, ".smap-update.lock"));
@@ -58,15 +71,8 @@ public static class UpdateTransaction
             if (!UpdatePlanning.Matches(copy, f.Size, f.Sha256)) throw new InvalidDataException("Update copy failed verification.");
             operations.Add(new(f.Path, File.Exists(target) ? Digest(target) : null, f.Sha256));
         }
-        string installed = Target(root, InstalledManifest);
-        if (File.Exists(installed))
+        if (prior != null)
         {
-            if (new FileInfo(installed).Length > UpdateFormat.MaxManifestBytes) throw new InvalidDataException("Installed manifest too large.");
-            byte[] old = File.ReadAllBytes(installed);
-            using var envelope = JsonDocument.Parse(old); var e = envelope.Deserialize<SignedUpdate>(UpdateFormat.Json)!;
-            using var payload = JsonDocument.Parse(Convert.FromBase64String(e.Payload));
-            string oldTag = payload.RootElement.GetProperty("tag").GetString()!;
-            var prior = UpdateFormat.Verify(old, keys, channel, oldTag);
             foreach (var f in prior.Files.Where(f => !names.Contains(f.Path)))
             {
                 string target = UpdateFormat.Under(root, f.Path); if (!File.Exists(target)) continue;

@@ -13,6 +13,34 @@ namespace SMAP.Tests;
 public sealed class UpdateChannelTests
 {
     [Theory]
+    [InlineData("alpha", "stable")]
+    [InlineData("stable", "alpha")]
+    [InlineData("stable", "stable")]
+    [InlineData("alpha", "alpha")]
+    public void InstallingAnotherChannelVerifiesPriorInventoryWithItsOwnSigningKey(string previousChannel, string nextChannel)
+    {
+        using var temp = new TestProject();
+        using var previousSigner = ECDsa.Create(ECCurve.NamedCurves.nistP256);
+        using var nextSigner = ECDsa.Create(ECCurve.NamedCurves.nistP256);
+        UpdateKey[] keys = [new("previous", Convert.ToBase64String(previousSigner.ExportSubjectPublicKeyInfo()), previousChannel), new("next", Convert.ToBase64String(nextSigner.ExportSubjectPublicKeyInfo()), nextChannel)];
+        string oldSource = temp.PathFor("old"), newSource = temp.PathFor("new"), root = temp.PathFor("installed");
+        foreach (string folder in new[] { oldSource, newSource, root }) Directory.CreateDirectory(folder);
+        foreach (string folder in new[] { oldSource, newSource }) File.WriteAllText(Path.Combine(folder, "SMAP.Updater.exe"), "synthetic worker");
+        File.WriteAllText(Path.Combine(oldSource, "SMAP.exe"), "old code"); File.WriteAllText(Path.Combine(newSource, "SMAP.exe"), "new code");
+        var previous = UpdateBuilder.Build(oldSource, temp.PathFor("old-packs"), previousChannel, previousChannel == "stable" ? "3.0.0" : "3.0.0-alpha.1");
+        foreach (string file in Directory.GetFiles(oldSource)) File.Copy(file, Path.Combine(root, Path.GetFileName(file)));
+        File.WriteAllBytes(Path.Combine(root, UpdateTransaction.InstalledManifest), UpdateBuilder.Sign(previous, "previous", previousSigner));
+        Directory.CreateDirectory(Path.Combine(root, "songs")); File.WriteAllText(Path.Combine(root, "songs", "own.txt"), "user song");
+        File.WriteAllText(Path.Combine(root, "settings.json"), "user settings");
+        var next = UpdateBuilder.Build(newSource, temp.PathFor("new-packs"), nextChannel, nextChannel == "stable" ? "3.1.0" : "3.1.0-alpha.1");
+        UpdateTransaction.Apply(root, newSource, UpdateBuilder.Sign(next, "next", nextSigner), keys, nextChannel, next.Tag);
+        Assert.Equal("new code", File.ReadAllText(Path.Combine(root, "SMAP.exe")));
+        Assert.Equal("user song", File.ReadAllText(Path.Combine(root, "songs", "own.txt")));
+        Assert.Equal("user settings", File.ReadAllText(Path.Combine(root, "settings.json")));
+        Assert.Equal(next.ReleaseId, UpdateFormat.Verify(File.ReadAllBytes(Path.Combine(root, UpdateTransaction.InstalledManifest)), keys, nextChannel, next.Tag).ReleaseId);
+    }
+
+    [Theory]
     [InlineData("3.0.0", "stable")]
     [InlineData("3.0.0-rc.2", "stable")]
     [InlineData("3.0.0-alpha.update.6", "alpha")]
