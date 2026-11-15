@@ -63,6 +63,8 @@ dotnet test Tests/SMAP.Tests.csproj -c Release
 
 完整打包输出为 `_smap_publish/`、`Payload/app.zip` 和 `_setup_out/SMAP-Setup.exe`。包含单文件主程序、更新助手、音源和许可。构建中间产物不要提交，SDK 路径须满足 global.json。
 
+构建与隔离测试临时数据合计不得超过 **5 GB（5,000,000,000 字节）**。请用 `SMAP_BUILD_SCRATCH_ROOT` 指定统一的 C 盘暂存根目录，构建前运行 `Tools/CheckBuildStorage.ps1` 并为下一步预留空间；打包脚本已内置检查。直接执行 dotnet 或复制测试安装时也须遵守同一预算。预算不足不得删除歌曲、设置或恢复备份。
+
 ## 工程结构
 
 - `src/SMAP.WPF/`：Views、Controls、Core、Services、Updates、Localization、Themes、Assets。

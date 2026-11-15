@@ -51,6 +51,8 @@ dotnet test Tests/SMAP.Tests.csproj -c Release
 
 Installer outputs: `_smap_publish/`, `Payload/app.zip`, `_setup_out/SMAP-Setup.exe`. Do not commit generated output.
 
+Build and isolated-test temporary storage must stay within **5 GB (5,000,000,000 bytes) combined**. Set `SMAP_BUILD_SCRATCH_ROOT` to one C-drive scratch root and run `Tools/CheckBuildStorage.ps1` with a reservation for the next operation. The installer build script checks this budget. Direct dotnet commands and test-install copies must follow the same limit. Never delete songs, settings or recovery backups to make room.
+
 ## Source layout
 
 `src/SMAP.WPF/` groups Views, Controls, Core, Services, Updates, Localization, Themes and Assets. `Installer/`, `Updater/`, `Tests/` and `Tools/` have separate responsibilities. `docs/` contains documentation, `曲谱库/` preserves original scores, and `legacy/JavaFX/` archives the earlier implementation.
