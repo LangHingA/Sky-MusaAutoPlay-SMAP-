@@ -14,12 +14,12 @@ An auto-play (auto-piano) helper for **Sky: Children of the Light** — reimagin
 
 ## Overview
 
-Developed by **LANGHINGA**. The current version is **v3.0.0-rc.5**, a prerelease candidate, not v3.0 Stable. This documentation update awaits user review.
+Developed by **LANGHINGA**. This delivery is **v3.0.0 Stable**. Release artifacts are prepared with the final version; this README and the release notes await user review before public release.
 
 SMAP plays Sky's instruments for you: import or create a sheet, and it performs it in-game.
 The latest release is a **full C# WPF rewrite** with a **music-player UI** — an account + collections sidebar, a cover-art library in the middle, the virtual keys on the right, and a full-width player bar at the bottom, plus a play queue, an inline cloud library, and a settings view.
 
-> 🎼 **v3.0 candidate**: native `.smap` multi-track projects, Tap/Hold, tempo and meter changes, four import tabs, Muse versioned sharing, image-score recovery, announcements and signed background differential updates. Legacy migration keeps original files; personal data is separate from the program.
+> 🎼 **v3.0.0**: native `.smap` multi-track projects, Tap/Hold, tempo and meter changes, four import tabs, Muse versioned sharing, image-score recovery, announcements and signed background differential updates. Legacy migration keeps original files; personal data is separate from the program.
 
 > 🍬 **v2.2 "YunYun"**: Practice now includes a **sheet wall, beat mode, and Game Practice** with an always-on-top window and global key listening while Sky has focus; global playback hotkeys have been redesigned; adds sheet-cover upload/display, website account avatars, and the new "Sunset Candy" theme; dropdowns and favorites gain nonlinear motion; updates can now download, install, and restart entirely in-app.
 
@@ -107,7 +107,7 @@ The original screenshots are retained to show the visual style. Import, sharing 
 
 ## Install / Use
 
-1. Download **SMAP-Setup.exe** for the desired version from [Releases](https://github.com/langhinga/Sky-MusaAutoPlay-SMAP-/releases). RC.5 is a test-channel prerelease; v3.0 Stable has not been released.
+1. Download **SMAP-Setup.exe** for the desired version from [Releases](https://github.com/langhinga/Sky-MusaAutoPlay-SMAP-/releases). v3.0.0 uses the stable update channel; the test channel is reserved for subsequent prereleases.
 2. Run it (it requests admin rights), pick an install path in the wizard; desktop / Start-menu shortcuts are created automatically.
 3. Take out an instrument in-game → double-click a song in SMAP to enqueue → press the bottom ▶ or `F1` in-game.
 
@@ -142,7 +142,7 @@ The source branches are main for stable and beta for testing. The client discove
 
 RC.4 to RC.5 passed real GitHub HTTPS differential download, verification, reconstruction and user-confirmed restart acceptance. This does not establish an online Stable-to-Stable test. Windows Authenticode is not configured; signed update metadata is distinct from a Windows publisher certificate. Real game performance and human listening require separate acceptance.
 
-v3.0 Stable remains subject to final approval. See the [release notes draft](docs/RELEASE-NOTES-v3.0-DRAFT.md).
+The v3.0.0 release documentation awaits user review. See the [release notes draft](docs/RELEASE-NOTES-v3.0-DRAFT.md).
 
 ## Old JavaFX build
 
