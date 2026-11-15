@@ -79,6 +79,7 @@ public static class UserDataMigration
         {
             string relative = Path.GetRelativePath(source, file), target = Path.GetFullPath(Path.Combine(destination, relative));
             if (!target.StartsWith(destination + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase)) throw new IOException("迁移路径越界。");
+            RejectLinks(target);
             string digest = Digest(file); long size = new FileInfo(file).Length;
             if (File.Exists(target) && (Digest(target) != digest || CloudConflict(profile, file, target)))
             {
