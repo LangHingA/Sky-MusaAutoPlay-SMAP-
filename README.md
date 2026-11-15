@@ -4,7 +4,7 @@
 
 作者：**LANGHINGA**。Windows 曲谱编辑、试听、练习与自动演奏工具，使用 C# / WPF / .NET 10。
 
-> 待用户审核。本分支为 **v3.0.0-rc.5 工程整顿候选**，尚未发布 v3.0 Stable。生产签名配置与最终验收仍待完成。
+> 待用户审核。本分支为 **v3.0.0-rc.5 工程整顿候选**，尚未发布 v3.0 Stable。独立 Stable 更新签名身份已配置；最终发行批准仍待完成。
 
 ## v3.0 已实现能力
 
@@ -79,7 +79,7 @@ dotnet test Tests/SMAP.Tests.csproj -c Release
 
 Alpha 与 Stable 使用独立签名身份。私钥不能进入 Git、构建属性或发行包。Stable 构建只接受发布者核准的 P-256 公钥和 KeyId；签名工具核对身份。完整安装器需要签名发行证明和准确 SHA-256，不仅依赖 HTTPS、大小或 MZ 文件头。
 
-当前 rc.4 候选已接入独立 Stable 公钥；更新链仍须本地验证，亦未声称持有 Authenticode 证书。最终签名、人工验收和发行批准未完成前不发布稳定版。见[待审核更新说明](docs/RELEASE-NOTES-v3.0-DRAFT.md)。
+当前 rc.5 候选已接入独立 Stable 公钥。RC.4 → RC.5 已通过真实 GitHub HTTPS 差分下载、验签、文件重建及用户重启更新验收；该结果不等同于 Stable → Stable 线上验收。程序尚无 Windows Authenticode 证书。正式版本仍须最终发行批准。见[待审核更新说明](docs/RELEASE-NOTES-v3.0-DRAFT.md)。
 
 ## 许可
 
