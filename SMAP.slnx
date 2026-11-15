@@ -15,6 +15,7 @@
   </Folder>
   <Folder Name="/Tools/">
     <Project Path="Tools/PackageAudit/PackageAudit.csproj" />
+    <Project Path="Tools/LayoutProbe/LayoutProbe.csproj" />
     <Project Path="Tools/ReleaseSigning/ReleaseSigning.csproj" />
     <Project Path="Tools/UpdatePack/UpdatePack.csproj" />
     <Project Path="Tools/UpdateProbe/UpdateProbe.csproj" />

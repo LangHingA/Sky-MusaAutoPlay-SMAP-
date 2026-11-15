@@ -1,4 +1,4 @@
-param([string]$OutputRoot = "", [string]$Dotnet = "C:\Program Files\dotnet\dotnet.exe")
+﻿param([string]$OutputRoot = "", [string]$Dotnet = "C:\Program Files\dotnet\dotnet.exe")
 # Build SMAP installer. Run from the Installer folder (script is pure ASCII to avoid PS5.1 GBK parse issues).
 $ErrorActionPreference = "Stop"
 $inst = $PSScriptRoot
@@ -18,12 +18,19 @@ function Clear-BuildDirectory([string]$path, [string]$leaf) {
     if (Test-Path -LiteralPath $resolved) { Remove-Item -LiteralPath $resolved -Recurse -Force }
 }
 
-Write-Host "[1/3] Publishing SMAP (self-contained win-x64)..." -ForegroundColor Cyan
+Write-Host "[1/4] Publishing SMAP (self-contained win-x64)..." -ForegroundColor Cyan
 Clear-BuildDirectory $pubDir "_smap_publish"
 & $dotnet publish $smapCsproj -c Release -r win-x64 --self-contained true -o $pubDir /p:DebugType=none /p:DebugSymbols=false --nologo
 if ($LASTEXITCODE -ne 0) { throw "SMAP publish failed" }
 
-# Bundle sample sheets into publish output songs\ (so a fresh install has some songs)
+Write-Host "[2/4] Publishing the update helper..." -ForegroundColor Cyan
+$helperDir = Join-Path $buildRoot "_updater_publish"
+Clear-BuildDirectory $helperDir "_updater_publish"
+& $dotnet publish (Join-Path $repo "Updater\SMAP.Updater.csproj") -c Release -r win-x64 --self-contained true -o $helperDir /p:DebugType=none /p:DebugSymbols=false --nologo
+if ($LASTEXITCODE -ne 0) { throw "Updater publish failed" }
+Copy-Item -LiteralPath (Join-Path $helperDir "SMAP.Updater.exe") -Destination $pubDir -Force
+
+# Immutable samples are seeded into user storage on first use, never installed over personal songs.
 $sampleDir = Join-Path $inst "sample-songs"
 if (Test-Path $sampleDir) {
     $songsOut = Join-Path $pubDir "Assets\Samples"
@@ -32,13 +39,13 @@ if (Test-Path $sampleDir) {
     "  {0} sample songs bundled" -f (Get-ChildItem $songsOut).Count | Write-Host
 }
 
-Write-Host "[2/3] Zipping into Payload\app.zip..." -ForegroundColor Cyan
+Write-Host "[3/4] Zipping into Payload\app.zip..." -ForegroundColor Cyan
 New-Item -ItemType Directory -Force (Split-Path $payload) | Out-Null
 if (Test-Path $payload) { Remove-Item $payload -Force }
 Compress-Archive -Path (Join-Path $pubDir "*") -DestinationPath $payload -CompressionLevel Optimal
 "{0:N1} MB payload" -f ((Get-Item $payload).Length / 1MB) | Write-Host
 
-Write-Host "[3/3] Publishing installer (embed payload, single-file)..." -ForegroundColor Cyan
+Write-Host "[4/4] Publishing installer (embed payload, single-file)..." -ForegroundColor Cyan
 Clear-BuildDirectory $outDir "_setup_out"
 # WPF single-file MUST include native libs for self-extract, else DllNotFoundException at startup.
 & $dotnet publish (Join-Path $inst "SMAP-Installer.csproj") -c Release -r win-x64 --self-contained true -o $outDir /p:PublishSingleFile=true /p:IncludeNativeLibrariesForSelfExtract=true /p:DebugType=none /p:DebugSymbols=false "/p:PayloadPath=$payload" --nologo

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
@@ -27,6 +27,7 @@
   <ItemGroup>
     <Resource Include="Assets\logo.png" />
     <EmbeddedResource Include="Assets\LegacyLayouts\managed-files.json" LogicalName="SMAP.LegacyProgramFiles.json" />
+    <Content Include="..\..\docs\ThirdPartyNotices.txt" Link="Licenses\ThirdPartyNotices.txt" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     <Content Include="..\..\LICENSE" Link="Licenses\LICENSE.txt" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     <Content Include="..\..\Installer\sample-songs\*" Link="Assets\Samples\%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
