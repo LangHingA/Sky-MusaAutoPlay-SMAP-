@@ -74,11 +74,9 @@ static class CoverUtil
     {
         try
         {
-            var node = JsonNode.Parse(File.ReadAllText(txtPath));
-            var o = FirstObject(node);
-            if (o == null) return false;
-            o["cover"] = Convert.ToBase64String(jpeg);
-            File.WriteAllText(txtPath, node!.ToJsonString());
+            var document = SongLibrary.LoadMetadata(txtPath);
+            document.Root["cover"] = Convert.ToBase64String(jpeg);
+            SongLibrary.SaveMetadata(document);
             return true;
         }
         catch { return false; }

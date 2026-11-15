@@ -486,10 +486,10 @@ public partial class MainWindow : Window
     void PlaylistSongInfo(SongInfo s)
     {
         if (!RequireLegacyDocument(s)) return;
-        var doc = SongLibrary.LoadDocument(s);
+        var doc = SongLibrary.LoadMetadata(s.File);
         var dlg = new InfoDialog(doc) { Owner = this };
         if (dlg.ShowDialog() != true) return;
-        SongLibrary.Save(doc, doc.Notes, doc.FilePath ?? s.File);
+        SongLibrary.SaveMetadata(doc);
         s.Name = doc.Name; s.Author = doc.Author; s.TranscribedBy = doc.TranscribedBy;
         PlaylistView.Items.Refresh();
         RefreshLibrary();

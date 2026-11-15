@@ -56,6 +56,8 @@ public class SongInfo : System.ComponentModel.INotifyPropertyChanged
 /// <summary>一份可编辑的曲谱: 保留原始全部字段(Root), 音符以拍位置存, 保存时 beat→ms 写回。</summary>
 public class SongDocument
 {
+    internal string? MetadataSourceHash;
+    internal int MetadataSongIndex;
     public JsonObject Root = new();       // 完整原始字段(author/pitchLevel/isEncrypted 等原样保留)
     public readonly List<Note> Notes = new();
     public double MsPerBeat = 500;        // 精确拍长(beat↔ms); 加载=GCD, 新建=120BPM
@@ -69,6 +71,44 @@ public class SongDocument
 
 public static class SongLibrary
 {
+    public static SongDocument LoadMetadata(string path, int songIndex = 0)
+    {
+        if (new FileInfo(path).Length > SmapFile.MaxManifestBytes) throw new InvalidDataException("旧曲谱过大。");
+        byte[] original = File.ReadAllBytes(path);
+        var node = JsonNode.Parse(ReadText(path)) ?? throw new InvalidDataException("旧曲谱为空。");
+        JsonObject song = node is JsonArray array && songIndex >= 0 && songIndex < array.Count ? array[songIndex]!.AsObject()
+            : songIndex == 0 && node is JsonObject obj ? obj : throw new InvalidDataException("曲目索引无效。");
+        return new SongDocument { Root = song.DeepClone().AsObject(), FilePath = Path.GetFullPath(path), MetadataSongIndex = songIndex,
+            MetadataSourceHash = Convert.ToHexStringLower(System.Security.Cryptography.SHA256.HashData(original)),
+            Name = song["name"]?.GetValue<string>() ?? Path.GetFileNameWithoutExtension(path),
+            Author = song["author"]?.GetValue<string>() ?? "", TranscribedBy = song["transcribedBy"]?.GetValue<string>() ?? "" };
+    }
+
+    public static void SaveMetadata(SongDocument document, Action? beforeCommit = null)
+    {
+        string path = document.FilePath ?? throw new InvalidOperationException("旧曲谱来源缺失。");
+        string expected = document.MetadataSourceHash ?? throw new InvalidOperationException("请先加载曲谱元信息。");
+        string Hash() => Convert.ToHexStringLower(System.Security.Cryptography.SHA256.HashData(File.ReadAllBytes(path)));
+        if (Hash() != expected) throw new IOException("曲谱已被其他操作修改，请重新打开。");
+        var container = JsonNode.Parse(ReadText(path)) ?? throw new InvalidDataException();
+        var song = container is JsonArray array ? array[document.MetadataSongIndex]!.AsObject() : container.AsObject();
+        song["name"] = document.Name; song["author"] = document.Author; song["transcribedBy"] = document.TranscribedBy;
+        if (document.Root.ContainsKey("cover")) song["cover"] = document.Root["cover"]?.DeepClone(); else song.Remove("cover");
+        byte[] bytes = new UTF8Encoding(false).GetBytes(container.ToJsonString());
+        string temporary = path + ".metadata-" + Guid.NewGuid().ToString("N") + ".tmp";
+        string backups = Path.Combine(Path.GetDirectoryName(path)!, ".smap-backups");
+        try
+        {
+            using (var output = new FileStream(temporary, FileMode.CreateNew, FileAccess.Write, FileShare.None)) { output.Write(bytes); output.Flush(true); }
+            beforeCommit?.Invoke();
+            if (Hash() != expected) throw new IOException("曲谱已被其他操作修改，请重新打开。");
+            Directory.CreateDirectory(backups);
+            File.Replace(temporary, path, Path.Combine(backups, Path.GetFileName(path) + "." + Guid.NewGuid().ToString("N") + ".bak"));
+            document.MetadataSourceHash = Convert.ToHexStringLower(System.Security.Cryptography.SHA256.HashData(bytes));
+        }
+        finally { if (File.Exists(temporary)) File.Delete(temporary); }
+    }
+
     // 程序目录下的 songs 文件夹(便携; 首次导入/下载时自动创建)
     public static string SongsDir = Path.Combine(AppContext.BaseDirectory, "songs");
 

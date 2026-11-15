@@ -17,6 +17,7 @@ public class InfoDialog : ChromeWindow
 
         // ── 封面(可选, 软件自动压缩; 存进曲谱内嵌) ──
         byte[]? cover = null;
+        bool coverChanged = false;
         try { var s = doc.Root["cover"]?.GetValue<string>(); if (!string.IsNullOrEmpty(s)) cover = Convert.FromBase64String(s); } catch { }
         var coverImg = new Image { Stretch = Stretch.UniformToFill };
         var coverHint = new TextBlock { Text = "无封面", Foreground = B("SubTextFg"), FontSize = 11, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
@@ -39,9 +40,9 @@ public class InfoDialog : ChromeWindow
             if (od.ShowDialog() != true) return;
             var bytes = CoverUtil.CompressToJpeg(od.FileName);
             if (bytes == null) return;
-            cover = bytes; coverImg.Source = CoverUtil.FromBytes(bytes); coverHint.Visibility = Visibility.Collapsed;
+            cover = bytes; coverChanged = true; coverImg.Source = CoverUtil.FromBytes(bytes); coverHint.Visibility = Visibility.Collapsed;
         };
-        clear.Click += (_, __) => { cover = null; coverImg.Source = null; coverHint.Visibility = Visibility.Visible; };
+        clear.Click += (_, __) => { cover = null; coverChanged = true; coverImg.Source = null; coverHint.Visibility = Visibility.Visible; };
         var coverBtns = new StackPanel { VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(12, 0, 0, 0) };
         var coverBtnRow = new StackPanel { Orientation = Orientation.Horizontal };
         coverBtnRow.Children.Add(pick); coverBtnRow.Children.Add(clear);
@@ -57,8 +58,11 @@ public class InfoDialog : ChromeWindow
             doc.Name = name.Box.Text.Trim();          // 允许留空, 保存时补 -未命名N-
             doc.Author = author.Box.Text.Trim();
             doc.TranscribedBy = trans.Box.Text.Trim();
-            if (cover != null) doc.Root["cover"] = Convert.ToBase64String(cover);   // 内嵌封面, Save 时落盘
-            else doc.Root.Remove("cover");
+            if (coverChanged)
+            {
+                if (cover != null) doc.Root["cover"] = Convert.ToBase64String(cover);
+                else doc.Root.Remove("cover");
+            }
             DialogResult = true;
         };
         var btns = new StackPanel { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Right, Margin = new Thickness(0, 14, 0, 0) };
