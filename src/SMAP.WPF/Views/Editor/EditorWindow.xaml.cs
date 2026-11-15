@@ -76,7 +76,7 @@ public partial class EditorWindow : Window
         StopPlayback();
         if (Path.GetExtension(song.File).Equals(".smap", StringComparison.OrdinalIgnoreCase))
         { Attach(SmapFile.Load(song.File)); _path = song.File; }
-        else { Attach(LegacyProjectAdapter.FromDocument(SongLibrary.LoadDocument(song))); _path = null; }
+        else { Attach(LegacyProjectAdapter.Load(song.File, 0)); _path = null; }
         Roll.PlayheadBeat = 0; Roll.SetView(0); RefreshTitle();
     }
     void Changed()

@@ -1426,7 +1426,7 @@ public partial class MainWindow : Window
     {
         SmapProject project;
         if (IsNative(song)) project = SmapFile.Load(song.File);
-        else project = LegacyProjectAdapter.FromDocument(SongLibrary.LoadDocument(song));
+        else project = LegacyProjectAdapter.Load(song.File, 0);
             _midiProject = project;
         _sequence = PlaybackSequence.FromProject(project, IsNative(song));
         _notes = _sequence.Notes.Select(n => (n.Key, (double)(n.StartMicroseconds / 1000))).ToList();
