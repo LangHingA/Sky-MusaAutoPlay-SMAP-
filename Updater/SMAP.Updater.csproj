@@ -18,5 +18,7 @@
     <Compile Include="../src/SMAP.WPF/Updates/UpdateTrust.cs" Link="UpdateTrust.cs" />
     <Compile Include="../src/SMAP.WPF/Updates/UpdateHealth.cs" Link="UpdateHealth.cs" />
     <Compile Include="../src/SMAP.WPF/Updates/UpdateVersions.cs" Link="UpdateVersions.cs" />
+    <Compile Include="../src/SMAP.WPF/Updates/LegacyProgramInventory.cs" Link="LegacyProgramInventory.cs" />
+    <EmbeddedResource Include="../src/SMAP.WPF/Assets/LegacyLayouts/managed-files.json" LogicalName="SMAP.LegacyProgramFiles.json" />
   </ItemGroup>
 </Project>

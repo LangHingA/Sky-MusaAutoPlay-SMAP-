@@ -32,6 +32,26 @@ public sealed class AppPaths
     public DataMigrationResult Prepare(Action<int>? checkpoint = null)
     {
         foreach (string path in new[] { Songs, Settings, Cache, Updates, Backups }) { UserDataMigration.RejectLinks(path); Directory.CreateDirectory(path); }
-        return UserDataMigration.Migrate(Path.Combine(Installation, "songs"), Songs, Settings, Backups, checkpoint);
+        var migration = UserDataMigration.Migrate(Path.Combine(Installation, "songs"), Songs, Settings, Backups, checkpoint);
+        string samples = Path.Combine(Installation, "Assets", "Samples");
+        if (Directory.Exists(samples))
+            foreach (string file in Directory.EnumerateFiles(samples))
+            {
+                if (Path.GetExtension(file).ToLowerInvariant() is not (".txt" or ".json" or ".smap")) continue;
+                UserDataMigration.RejectLinks(file); string destination = Path.Combine(Songs, Path.GetFileName(file)); UserDataMigration.RejectLinks(destination);
+                if (File.Exists(destination)) continue;
+                string temporary = destination + ".seed-" + Guid.NewGuid().ToString("N") + ".tmp";
+                try
+                {
+                    using (var input = File.OpenRead(file))
+                    using (var output = new FileStream(temporary, FileMode.CreateNew, FileAccess.Write, FileShare.None)) { input.CopyTo(output); output.Flush(true); }
+                    using (var before = File.OpenRead(file))
+                    using (var after = File.OpenRead(temporary))
+                        if (!System.Security.Cryptography.SHA256.HashData(before).SequenceEqual(System.Security.Cryptography.SHA256.HashData(after))) throw new IOException("示例曲谱复制校验失败。");
+                    File.Move(temporary, destination, false);
+                }
+                finally { if (File.Exists(temporary)) File.Delete(temporary); }
+            }
+        return migration;
     }
 }

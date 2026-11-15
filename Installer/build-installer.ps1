@@ -26,7 +26,7 @@ if ($LASTEXITCODE -ne 0) { throw "SMAP publish failed" }
 # Bundle sample sheets into publish output songs\ (so a fresh install has some songs)
 $sampleDir = Join-Path $inst "sample-songs"
 if (Test-Path $sampleDir) {
-    $songsOut = Join-Path $pubDir "songs"
+    $songsOut = Join-Path $pubDir "Assets\Samples"
     New-Item -ItemType Directory -Force $songsOut | Out-Null
     Copy-Item (Join-Path $sampleDir "*") $songsOut -Force
     "  {0} sample songs bundled" -f (Get-ChildItem $songsOut).Count | Write-Host

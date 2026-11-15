@@ -26,7 +26,14 @@
 
   <ItemGroup>
     <Resource Include="Assets\logo.png" />
+    <EmbeddedResource Include="Assets\LegacyLayouts\managed-files.json" LogicalName="SMAP.LegacyProgramFiles.json" />
+    <Content Include="..\..\LICENSE" Link="Licenses\LICENSE.txt" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <Content Include="..\..\Installer\sample-songs\*" Link="Assets\Samples\%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
+  <PropertyGroup Condition="'$(RuntimeIdentifier)' != ''">
+    <PublishSingleFile>true</PublishSingleFile>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+  </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="NAudio" Version="2.3.0" />

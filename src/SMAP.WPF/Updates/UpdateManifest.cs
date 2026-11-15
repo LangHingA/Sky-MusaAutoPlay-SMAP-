@@ -88,12 +88,14 @@ public static class UpdateFormat
         if (parts.Any(p => p.Length == 0 || p is "." or ".." || p.EndsWith('.') || p.EndsWith(' ') || p.Any(c => c < 32 || "<>:\"|?*".Contains(c))
             || Regex.IsMatch(p, @"\A(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])(?:\.|\z)", RegexOptions.IgnoreCase)))
             throw new InvalidDataException("Unsafe update path.");
-        bool root = parts.Length == 1 && (relative is "SMAP.exe" or "SMAP.Updater.exe" or "createdump.exe" or "SMAP.deps.json" or "SMAP.runtimeconfig.json" or "LICENSE.txt" or "ThirdPartyNotices.txt"
+        bool root = parts.Length == 1 && (relative is "SMAP.exe" or "SMAP.Updater.exe" or "SMAP.pdb" or "createdump.exe" or "SMAP.deps.json" or "SMAP.runtimeconfig.json" or "LICENSE.txt" or "ThirdPartyNotices.txt"
             || relative.EndsWith(".dll", StringComparison.OrdinalIgnoreCase));
         bool asset = parts.Length >= 2 && parts[0] is "Assets" or "runtimes" && Path.GetExtension(relative).ToLowerInvariant() is ".wav" or ".dll" or ".json" or ".png";
         bool satellite = parts.Length == 2 && parts[0] is "cs" or "de" or "es" or "fr" or "it" or "ja" or "ko" or "pl" or "pt-BR" or "ru" or "tr" or "zh-Hans" or "zh-Hant"
             && parts[1].EndsWith(".resources.dll", StringComparison.OrdinalIgnoreCase);
-        if (!root && !asset && !satellite) throw new InvalidDataException("An update cannot modify private data or songs.");
+        bool license = parts.Length == 2 && parts[0] == "Licenses" && parts[1] is "LICENSE.txt" or "ThirdPartyNotices.txt";
+        bool sample = parts.Length == 3 && parts[0] == "Assets" && parts[1] == "Samples" && Path.GetExtension(relative).ToLowerInvariant() is ".txt" or ".json" or ".smap";
+        if (!root && !asset && !satellite && !license && !sample) throw new InvalidDataException("An update cannot modify private data or songs.");
     }
 
     public static string Under(string root, string relative)

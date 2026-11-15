@@ -80,6 +80,9 @@ public static class UpdateTransaction
                 operations.Add(new(f.Path, f.Sha256, null));
             }
         }
+        // Retain exact known legacy binaries in the transaction backup; never guess ownership by extension alone.
+        foreach (var file in LegacyProgramInventory.Matching(root).Where(f => !names.Contains(f.Path)))
+            if (!operations.Any(op => op.Path.Equals(file.Path, StringComparison.OrdinalIgnoreCase))) operations.Add(new(file.Path, file.Sha256, null));
         Save(Path.Combine(recovery, "new-manifest.json"), signed);
         operations.Add(new(InstalledManifest, File.Exists(installed) ? Digest(installed) : null, UpdateFormat.Hash(signed)));
         var journal = new UpdateJournal(root, channel, tag, signed, operations.ToArray(), "applying");
@@ -101,6 +104,7 @@ public static class UpdateTransaction
             foreach (var file in manifest.Files)
                 if (!UpdatePlanning.Matches(UpdateFormat.Under(root, file.Path), file.Size, file.Sha256)) throw new IOException("Post-install verification failed.");
             Save(journalPath, JsonSerializer.SerializeToUtf8Bytes(journal with { State = "committed" }, UpdateFormat.Json));
+            LegacyProgramInventory.RemoveEmptyProgramDirectories(root, operations.Where(op => op.NewHash == null).Select(op => op.Path));
         }
         catch
         {
