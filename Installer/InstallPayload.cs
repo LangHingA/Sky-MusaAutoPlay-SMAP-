@@ -1,4 +1,4 @@
-using System.IO;
+﻿using System.IO;
 using System.IO.Compression;
 
 namespace SMAP_Installer;
@@ -41,6 +41,11 @@ internal static class InstallPayload
             CheckLinks(root, destination); entries.Add((entry, relative, destination, song));
         }
         if (!names.Contains("SMAP.exe")) throw new InvalidDataException("安装包缺少 SMAP.exe。");
+        Directory.CreateDirectory(root);
+        string updateLock = Path.Combine(root, ".smap-update.lock"), runningLock = Path.Combine(root, ".smap-running.lock");
+        CheckLinks(root, updateLock); CheckLinks(root, runningLock);
+        using var gate = new FileStream(updateLock, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None);
+        using var running = new FileStream(runningLock, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None);
         string parent = Path.GetDirectoryName(root)!; Directory.CreateDirectory(parent);
         string staging = Path.Combine(parent, ".smap-install-" + Guid.NewGuid().ToString("N")); Directory.CreateDirectory(staging);
         var replaced = new List<(string destination, string? backup)>(); var obsoletePaths = new List<string>(); bool retainRecovery = false;

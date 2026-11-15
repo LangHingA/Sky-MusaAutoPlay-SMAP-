@@ -1,4 +1,4 @@
-using System.IO;
+﻿using System.IO;
 using System.IO.Compression;
 using SMAP_Installer;
 using Xunit;
@@ -72,5 +72,17 @@ public sealed class InstallerPayloadTests
             string recovery=Directory.GetDirectories(dir.DirectoryPath,".smap-install-*").Single();Assert.Equal("old-code",File.ReadAllText(Path.Combine(recovery,"old","SMAP.exe")));
         }
         finally { locked?.Dispose(); }
+    }
+
+    [Fact]
+    public void RunningApplicationGatePreventsInstallBeforeAnyReplacement()
+    {
+        using var temp = new TestProject(); string target = temp.PathFor("app"); Directory.CreateDirectory(target);
+        File.WriteAllText(Path.Combine(target,"SMAP.exe"),"old");
+        using var running = new FileStream(Path.Combine(target,".smap-running.lock"),FileMode.OpenOrCreate,FileAccess.ReadWrite,FileShare.ReadWrite);
+        using var zip = Payload(("SMAP.exe","new"));
+        Assert.Throws<IOException>(()=>InstallPayload.Extract(zip,target));
+        Assert.Equal("old",File.ReadAllText(Path.Combine(target,"SMAP.exe")));
+        Assert.Empty(Directory.GetDirectories(temp.DirectoryPath,".smap-install-*"));
     }
 }

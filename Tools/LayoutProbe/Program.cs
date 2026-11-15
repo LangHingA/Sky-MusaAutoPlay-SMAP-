@@ -14,7 +14,7 @@ void CopyTree(string from, string to) { foreach (var file in Directory.Enumerate
 void Extract(string target, Action<int, string>? progress = null) { using var file = File.OpenRead(payload); InstallPayload.Extract(file, target, progress); }
 try {
 string fresh = Path.Combine(work, "fresh"); Extract(fresh);
-Check("fresh compact files and helper", Directory.GetFiles(fresh).Select(Path.GetFileName).Order().SequenceEqual(new[] { "SMAP.Updater.exe", "SMAP.exe" }.Order()));
+Check("fresh compact files and helper", Directory.GetFiles(fresh).Where(f=>!Path.GetFileName(f).StartsWith(".smap-")).Select(Path.GetFileName).Order().SequenceEqual(new[] { "SMAP.Updater.exe", "SMAP.exe" }.Order()));
 Check("immutable resources and licenses", Directory.Exists(Path.Combine(fresh,"Assets","Instruments")) && File.Exists(Path.Combine(fresh,"Licenses","ThirdPartyNotices.txt")));
 string target = Path.Combine(work, "upgrade"); CopyTree(legacy, target);
 File.WriteAllText(Path.Combine(target,"unrecognized.dll"), "unknown user file must stay");
@@ -26,7 +26,7 @@ Check("official legacy fixture contains verified obsolete runtime",known.Length 
 Extract(target); Check("legacy upgrade unknown file retained",File.ReadAllText(Path.Combine(target,"unrecognized.dll"))=="unknown user file must stay");
 Check("all legacy songs byte identical",personal.All(f=>File.Exists(Path.Combine(target,f.Key))&&Hash(Path.Combine(target,f.Key))==f.Value));
 Check("known obsolete runtime archived", known.Where(f=>!File.Exists(Path.Combine(fresh,f.Path))).All(f=>!File.Exists(Path.Combine(target,f.Path))));
-Check("upgrade root compact plus unknown user file",Directory.GetFiles(target).Length == 3);
+Check("upgrade root compact plus unknown user file",Directory.GetFiles(target).Count(f=>!Path.GetFileName(f).StartsWith(".smap-")) == 3);
 string failed=Path.Combine(work,"interrupted"); CopyTree(legacy,failed);
 var originals=Directory.GetFiles(failed,"*",SearchOption.AllDirectories).ToDictionary(f=>Path.GetRelativePath(failed,f),Hash);
 bool interrupted=false; try {Extract(failed,(percent,_)=>{if(percent>0)throw new IOException("synthetic interrupted install");});}catch(IOException){interrupted=true;}

@@ -1,6 +1,6 @@
-# SMAP ? Sky Music AutoPlay
+# SMAP — Sky Music AutoPlay
 
-[简体中文](README.md) ? [Repository](https://github.com/langhinga/Sky-MusaAutoPlay-SMAP-)
+[简体中文](README.md) · [Repository](https://github.com/langhinga/Sky-MusaAutoPlay-SMAP-)
 
 Developed by **LANGHINGA**. A Windows music project editor, preview, practice and automatic performance app built with C#, WPF and .NET 10.
 
