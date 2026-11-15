@@ -4,7 +4,7 @@
 
 Developed by **LANGHINGA**. A Windows music project editor, preview, practice and automatic performance app built with C#, WPF and .NET 10.
 
-> Documentation draft for approval. This branch is the **v3.0.0-rc.4 maintenance candidate**, not a published v3.0 Stable release. Signing and final acceptance remain release gates.
+> Documentation draft for approval. This branch is the **v3.0.0-rc.5 maintenance candidate**, not a published v3.0 Stable release. Signing and final acceptance remain release gates.
 
 ## Implemented in v3.0
 
