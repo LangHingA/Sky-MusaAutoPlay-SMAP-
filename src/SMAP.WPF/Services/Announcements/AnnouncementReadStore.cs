@@ -5,7 +5,7 @@ namespace SMAP_WPF.Announcements;
 
 public sealed class AnnouncementReadStore
 {
-    public static string DefaultPath => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "SMAP", "announcements-v1.json");
+    public static string DefaultPath => Path.Combine(AppPaths.Current.Settings, "announcements-v1.json");
     sealed record State(int SchemaVersion, Dictionary<long, int> Read, Dictionary<long, int> Notified);
     readonly string _path;
     readonly object _gate = new();

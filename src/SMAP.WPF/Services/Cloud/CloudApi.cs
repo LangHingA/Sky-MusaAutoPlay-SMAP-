@@ -73,7 +73,7 @@ public static class CloudApi
     public static bool LoggedIn => Session != null && CloudSessionStore.IsUsable(Session);
     internal static string? SharingToken => LoggedIn ? Session!.Token : null;
     internal static void SharingAuthenticationFailed() => ForgetSession();
-    static readonly string AuthFile = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "SMAP", "session.dat");
+    static readonly string AuthFile = Path.Combine(AppPaths.Current.Settings, "session.dat");
 
     static void Apply(CloudSession? session)
     {

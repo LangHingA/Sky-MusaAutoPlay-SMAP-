@@ -110,7 +110,7 @@ public static class SongLibrary
     }
 
     // 程序目录下的 songs 文件夹(便携; 首次导入/下载时自动创建)
-    public static string SongsDir = Path.Combine(AppContext.BaseDirectory, "songs");
+    public static string SongsDir = AppPaths.Current.Songs;
 
     internal static string CopyImported(string source)
     {

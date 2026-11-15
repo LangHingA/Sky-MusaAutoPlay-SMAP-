@@ -20,7 +20,7 @@ public class Folder : System.ComponentModel.INotifyPropertyChanged
 
 public static class FolderStore
 {
-    static readonly string Dir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "SMAP");
+    static readonly string Dir = AppPaths.Current.Settings;
     static readonly string FilePath = Path.Combine(Dir, "folders.json");
 
     public static List<Folder> Load()

@@ -50,7 +50,7 @@ internal sealed class AuditionSampleBank
         foreach (var tone in requests)
         {
             if (Count == MaxSounds || tone.SampleShift is < -48 or > 48) throw new InvalidDataException("试听资源超出支持范围，请减少声部或缩短区段。");
-            string path = Path.Combine(AppContext.BaseDirectory, "Assets", "Instruments", tone.Instrument, tone.SampleKey + ".wav");
+            string path = Path.Combine(AppPaths.Current.Instruments, tone.Instrument, tone.SampleKey + ".wav");
             if (SamplePitch(tone.Instrument, tone.SampleKey) == null || !File.Exists(path)) throw new InvalidDataException("缺少已校准的试听采样。");
             var sound = new CachedSound(path, tone.SampleShift);
             long bytes = ((long)sound.Data.Length + sound.LoopData.Length) * sizeof(float);

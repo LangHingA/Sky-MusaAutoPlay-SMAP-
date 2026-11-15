@@ -24,7 +24,7 @@ internal static class UpdateStartupGuard
             {
                 var manifest = UpdateFormat.Verify(journal.SignedManifest, UpdateTrust.Keys, journal.Channel, journal.Tag);
                 var helper = manifest.Files.Single(f => f.Path == "SMAP.Updater.exe");
-                string directory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SMAP", "updates", "releases", manifest.ReleaseId.ToString("N"), "handoff");
+                string directory = Path.Combine(AppPaths.Current.Updates, "releases", manifest.ReleaseId.ToString("N"), "handoff");
                 UpdateFormat.RejectLinks(directory);
                 string? worker = Directory.Exists(directory) ? Directory.EnumerateDirectories(directory).Take(100)
                     .Select(p => Path.Combine(p, "SMAP.Updater.exe")).FirstOrDefault(p => UpdatePlanning.Matches(p, helper.Size, helper.Sha256)) : null;

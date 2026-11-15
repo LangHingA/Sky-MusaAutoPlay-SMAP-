@@ -7,8 +7,7 @@ namespace SMAP_WPF;
 /// <summary>15 键键位配置的持久化: 存 %APPDATA%\SMAP\keyconfig.json, 只存 VK 码, 标签由 VK 反推。</summary>
 public static class KeyConfig
 {
-    static readonly string Dir = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "SMAP");
+    static readonly string Dir = AppPaths.Current.Settings;
     static readonly string File = Path.Combine(Dir, "keyconfig.json");
 
     /// <summary>读取配置; 无文件或损坏时回退默认。返回长度 15 的 VK 数组。</summary>

@@ -6,8 +6,7 @@ namespace SMAP_WPF;
 /// <summary>简单文件日志: 写 %APPDATA%\SMAP\logs\smap-YYYYMMDD.log。捕获崩溃/错误/关键事件, 供"上传日志"取用。</summary>
 public static class Logger
 {
-    static readonly string Dir = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "SMAP", "logs");
+    static readonly string Dir = Path.Combine(AppPaths.Current.Settings, "logs");
     static readonly object _lock = new();
 
     public static string TodayFile => Path.Combine(Dir, $"smap-{DateTime.Now:yyyyMMdd}.log");

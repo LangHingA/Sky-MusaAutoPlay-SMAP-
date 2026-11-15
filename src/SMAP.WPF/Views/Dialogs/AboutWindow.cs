@@ -13,8 +13,7 @@ namespace SMAP_WPF;
 public class AboutWindow : Window
 {
     const string Repo = "https://github.com/langhinga/Sky-MusaAutoPlay-SMAP-";
-    static readonly string LastCheckFile = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "SMAP", "lastcheck.txt");
+    static readonly string LastCheckFile = Path.Combine(AppPaths.Current.Settings, "lastcheck.txt");
 
     readonly TextBlock _titleText = new() { Foreground = Brushes.White, FontWeight = FontWeights.SemiBold, VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(8, 0, 0, 0) };
     readonly TextBlock _nameLine, _verLine, _authorLine;

@@ -13,7 +13,7 @@ public sealed record PendingPublication(Guid CreateKey, Guid PublishKey, int Act
 // Cloud relations stay outside project.json and SVG/PNG recovery envelopes.
 public sealed class NativeSharingStore(string directory)
 {
-    public static string DefaultDirectory => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "SMAP", "NativeSharing");
+    public static string DefaultDirectory => Path.Combine(AppPaths.Current.Settings, "NativeSharing");
     string PendingPath(int actor) => Path.Combine(directory, $"pending-{actor}.json");
     string PayloadPath(Guid id) => Path.Combine(directory, "pending-" + id.ToString("N") + ".smap");
     string LinkPath(string file) => Path.Combine(directory, "link-" + Convert.ToHexStringLower(SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(Path.GetFullPath(file).ToUpperInvariant()))) + ".json");

@@ -9,8 +9,7 @@ namespace SMAP_WPF;
 /// 默认按母采样音域还原游戏相对音高(低音乐器默认降八度), 玩家可在音高 pill 里改。</summary>
 public static class PitchConfig
 {
-    static readonly string Dir = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "SMAP");
+    static readonly string Dir = AppPaths.Current.Settings;
     static readonly string FilePath = Path.Combine(Dir, "pitch.json");
 
     // 内置默认: 母采样音域偏低的乐器降八度以贴近游戏(O=3→-12, O=2→-24);

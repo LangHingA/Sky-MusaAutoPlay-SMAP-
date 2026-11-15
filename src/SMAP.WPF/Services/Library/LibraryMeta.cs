@@ -15,8 +15,7 @@ public static class LibraryMeta
         public Dictionary<string, List<string>> Tags { get; set; } = new();
     }
 
-    static readonly string Dir = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "SMAP");
+    static readonly string Dir = AppPaths.Current.Settings;
     static readonly string File = Path.Combine(Dir, "library.json");
     static Data _d = Load();
 

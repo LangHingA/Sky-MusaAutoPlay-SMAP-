@@ -232,7 +232,7 @@ public static partial class AudioEngine
     }
 
     const int Keys = 15;
-    static readonly string Dir = Path.Combine(AppContext.BaseDirectory, "Assets", "Instruments");
+    static readonly string Dir = AppPaths.Current.Instruments;
     public static readonly string[] Instruments =
         { "Piano", "Harp", "Guitar", "Flute", "Ukulele", "Winter Piano", "Xylophone", "Electric Guitar", "Bassoon", "Orff", "Kalimba", "Ocarina", "Cello", "Violin", "Saxophone", "Pipa", "Quena", "Bugle", "Glock", "LightGuitar", "GoldPiano", "Horn", "Handpan", "GoldHandpan", "Dundun", "APBell1", "APBell2",
           "Harmonica", "AP18Ocarina", "AP29Piccolo", "GoldBugle", "APPiano", "4thAnnivArp", "4thAnnivLead",

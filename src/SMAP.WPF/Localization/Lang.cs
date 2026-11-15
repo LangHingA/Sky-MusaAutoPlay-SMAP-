@@ -15,8 +15,7 @@ public static partial class Lang
     /// <summary>菜单里显示的语言原生名。</summary>
     public static readonly string[] Names = { "简体中文", "繁體中文", "English", "日本語" };
 
-    static readonly string File = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "SMAP", "lang.txt");
+    static readonly string File = Path.Combine(AppPaths.Current.Settings, "lang.txt");
 
     // key → [简, 繁, En, 日]
     static readonly Dictionary<string, string[]> T = new()

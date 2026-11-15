@@ -8,7 +8,7 @@ sealed class EditorViewPreferences
 {
     public Dictionary<Guid, string> Colors { get; set; } = new();
     public bool ReduceMotion { get; set; }
-    static string FileName => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "SMAP", "editor-view.json");
+    static string FileName => Path.Combine(AppPaths.Current.Settings, "editor-view.json");
     public static readonly string[] Palette = { "#72b1ff", "#b8a0f5", "#74c6b0", "#efb24f", "#f08db4", "#a5c46d" };
     public Color Color(Guid id, int index)
     {

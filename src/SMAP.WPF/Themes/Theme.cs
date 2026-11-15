@@ -16,8 +16,7 @@ public static class Theme
     public static bool Dark => Current == AppTheme.Dark;
     public static string LangKey => Current switch { AppTheme.Light => "theme.light", AppTheme.SunsetPink => "theme.sunset", _ => "theme.dark" };
 
-    static readonly string File = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "SMAP", "theme.txt");
+    static readonly string File = Path.Combine(AppPaths.Current.Settings, "theme.txt");
 
     public static AppTheme Load()
     {

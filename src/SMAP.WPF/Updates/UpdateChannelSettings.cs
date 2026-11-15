@@ -5,7 +5,7 @@ namespace SMAP_WPF.Updates;
 
 public static class UpdateChannelSettings
 {
-    public static string FilePath => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "SMAP", "update-channel.txt");
+    public static string FilePath => Path.Combine(AppPaths.Current.Settings, "update-channel.txt");
     public static string DefaultFor(string version) => version.Contains("-alpha.", StringComparison.Ordinal) ? "alpha" : "stable";
     public static void Validate(string channel)
     {

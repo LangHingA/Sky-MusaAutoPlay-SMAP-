@@ -7,7 +7,7 @@ namespace SMAP_WPF;
 public partial class App : Application
 {
     System.IO.FileStream? _updateRunLock;
-    protected override void OnStartup(StartupEventArgs e)
+    protected override async void OnStartup(StartupEventArgs e)
     {
         try
         {
@@ -20,7 +20,14 @@ public partial class App : Application
             MsgBox.Info(null, Lang.Update("startupBusy"), Lang.Update("title"));
             Shutdown(); return;
         }
+        try { await Task.Run(() => AppPaths.Current.Prepare()); }
+        catch (Exception error) when (error is System.IO.IOException or UnauthorizedAccessException or System.Text.Json.JsonException)
+        {
+            MessageBox.Show("数据迁移未完成，原文件和配置备份已保留。请核对后重试。\n" + error.Message, "SMAP");
+            Shutdown(); return;
+        }
         base.OnStartup(e);
+        MainWindow = new MainWindow(); MainWindow.Show();
     }
     protected override void OnExit(ExitEventArgs e) { _updateRunLock?.Dispose(); base.OnExit(e); }
     public App()

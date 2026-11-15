@@ -37,7 +37,8 @@ public static class UpdateBuilder
             foreach (var path in Directory.EnumerateFileSystemEntries(directory))
             {
                 string relative = Path.GetRelativePath(root, path).Replace('\\', '/');
-                if (relative.Split('/')[0].Equals("songs", StringComparison.OrdinalIgnoreCase) || relative.StartsWith(".smap-", StringComparison.Ordinal)) continue;
+                if (relative.Split('/')[0].Equals("songs", StringComparison.OrdinalIgnoreCase) || relative.Split('/')[0].Equals("Data", StringComparison.OrdinalIgnoreCase)
+                    || relative.Equals("portable.mode", StringComparison.OrdinalIgnoreCase) || relative.StartsWith(".smap-", StringComparison.Ordinal)) continue;
                 UpdateFormat.RejectLinks(path);
                 if (Directory.Exists(path)) { foreach (var child in Walk(path)) yield return child; }
                 else yield return path;
@@ -47,7 +48,8 @@ public static class UpdateBuilder
         {
             string relative = Path.GetRelativePath(root, file).Replace('\\', '/');
             // Published folders may contain user songs. They never enter an update, even on first adoption.
-            if (relative.Split('/')[0].Equals("songs", StringComparison.OrdinalIgnoreCase) || relative.StartsWith(".smap-", StringComparison.Ordinal)) continue;
+            if (relative.Split('/')[0].Equals("songs", StringComparison.OrdinalIgnoreCase) || relative.Split('/')[0].Equals("Data", StringComparison.OrdinalIgnoreCase)
+                || relative.Equals("portable.mode", StringComparison.OrdinalIgnoreCase) || relative.StartsWith(".smap-", StringComparison.Ordinal)) continue;
             if (relative.EndsWith(".pdb", StringComparison.OrdinalIgnoreCase)) continue;
             if (descriptions.Count >= 10000) throw new InvalidDataException("Too many update files.");
             UpdateFormat.ManagedPath(relative); UpdateFormat.RejectLinks(file);

@@ -32,8 +32,7 @@ public partial class MainWindow : Window
     enum PlayMode { RepeatAll, RepeatOne, Shuffle }   // 列表循环 / 单曲循环 / 随机播放
     PlayMode _playMode = PlayMode.RepeatAll;
     readonly Random _rng = new();
-    static string PlayModeFile => System.IO.Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "SMAP", "playmode.txt");
+    static string PlayModeFile => System.IO.Path.Combine(AppPaths.Current.Settings, "playmode.txt");
 
     // 收藏夹(歌单)
     readonly System.Collections.ObjectModel.ObservableCollection<Folder> _folders = new();
@@ -44,12 +43,9 @@ public partial class MainWindow : Window
     bool _cloudMode, _cloudLoading, _cloudReloadPending;
     Func<string, string, int, int, int, Task<CloudApi.ListResult>> _cloudQuery = CloudApi.ListAsync;
     int _cloudPage = 1, _cloudPages = 1;
-    static string PlaylistFile => System.IO.Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "SMAP", "playlist.txt");
-    static string NowPlayingFile => System.IO.Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "SMAP", "nowplaying.txt");
-    static string PrefsFile => System.IO.Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "SMAP", "prefs.txt");
+    static string PlaylistFile => System.IO.Path.Combine(AppPaths.Current.Settings, "playlist.txt");
+    static string NowPlayingFile => System.IO.Path.Combine(AppPaths.Current.Settings, "nowplaying.txt");
+    static string PrefsFile => System.IO.Path.Combine(AppPaths.Current.Settings, "prefs.txt");
     bool _prefsLoading;   // 载入偏好期间抑制回存
     double _pendingResumeMs;    // 上次退出保留的进度: 恢复曲首次播放时 seek 到此处
     SongInfo? _resumeSong;      // 与 _pendingResumeMs 配对, 只对这首生效

@@ -11,7 +11,7 @@ public sealed record InputPreferences
     public List<PerformanceBindingProfile> Performance { get; init; } = new();
     public List<InstrumentCapability> Capabilities { get; init; } = new();
     public InstrumentCapability? Capability(string instrument)=>Capabilities.FirstOrDefault(c=>c.InstrumentId==instrument)??InstrumentCapabilities.ForInstrument(instrument);
-    static string FilePath => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),"SMAP","input-v1.json");
+    static string FilePath => Path.Combine(AppPaths.Current.Settings,"input-v1.json");
     public PerformanceBindingProfile For(InstrumentCapability c, IReadOnlyList<ushort> legacy) => Performance.FirstOrDefault(p=>p.CapabilityId==c.Id && p.CapabilityVersion==c.Version)
         ?? PerformanceBindingProfile.FromLegacy(c,legacy);
     public IEnumerable<ushort> AllPerformanceKeys(IEnumerable<ushort> legacy) => (Performance.FirstOrDefault(p=>p.CapabilityId=="sky:Piano:major:0")?.Keys.Values ?? legacy)

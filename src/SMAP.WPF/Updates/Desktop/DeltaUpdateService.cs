@@ -21,7 +21,7 @@ public sealed class DeltaUpdateService : IDisposable
     public bool Supported => UpdateTrust.Keys.Any(k => k.Channel == Channel);
     readonly GitHubUpdates _remote = new();
     readonly string _root = AppContext.BaseDirectory;
-    readonly string _working = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SMAP", "updates");
+    readonly string _working = AppPaths.Current.Updates;
     CancellationTokenSource? _operation;
     bool _running, _disposed, _handoffPreparing;
     byte[]? _signed;

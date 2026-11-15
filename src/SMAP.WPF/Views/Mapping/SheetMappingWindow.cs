@@ -27,7 +27,7 @@ public sealed class SheetMappingWindow:ChromeWindow
     public bool GameForeground=>_target is {} target&&GameWindows.IsForeground(target);
     public double Speed {get=>_speed;set{_speed=value;if(_practice!=null)_practice.Session.Speed=value;}}
     static string S(string k)=>Lang.S("map."+k);
-    static string CalibrationPath(InstrumentCapability c)=>Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),"SMAP","calibration",SheetCalibration.Fingerprint(c)+".json");
+    static string CalibrationPath(InstrumentCapability c)=>Path.Combine(AppPaths.Current.Settings,"calibration",SheetCalibration.Fingerprint(c)+".json");
     public SheetMappingWindow(SmapProject project,Func<InstrumentCapability,PerformanceBindingProfile> bindings,Func<string,InstrumentCapability?>? capabilities=null)
         :this(project,bindings,capabilities,FeatureAvailability.RequireSheetMapping()) { }
     SheetMappingWindow(SmapProject project,Func<InstrumentCapability,PerformanceBindingProfile> bindings,Func<string,InstrumentCapability?>? capabilities,bool available):base(S("title"),780)
