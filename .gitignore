@@ -21,3 +21,7 @@ key_config.json
 _skystudio_extract/
 build/
 dist/
+
+# Publisher private signing material must remain outside Git.
+.smap-signing/
+stable-private.pem

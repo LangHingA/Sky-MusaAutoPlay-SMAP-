@@ -1,7 +1,12 @@
 <Project>
   <PropertyGroup>
-    <Version>3.0.0-rc.3</Version>
+    <Version>3.0.0-rc.4</Version>
     <NuGetAudit>false</NuGetAudit>
+  </PropertyGroup>
+  <!-- Publisher-approved public identity only. Private key remains outside the repository. -->
+  <PropertyGroup Condition="'$(StableUpdatePublicKey)' == '' and '$(StableUpdateKeyId)' == ''">
+    <StableUpdateKeyId>stable-20261115</StableUpdateKeyId>
+    <StableUpdatePublicKey>MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEm2I3+W6o4IoAGZexIwQsx8StHpauZBMZmwgh6krO51OGeflw5WLcNeUhibcsb38Exy3nbK0t1T0M4LN1gxnAgw==</StableUpdatePublicKey>
   </PropertyGroup>
   <ItemGroup Condition="'$(StableUpdatePublicKey)' != '' and '$(StableUpdateKeyId)' != ''">
     <AssemblyMetadata Include="SMAP.StableUpdatePublicKey" Value="$(StableUpdatePublicKey)" />
