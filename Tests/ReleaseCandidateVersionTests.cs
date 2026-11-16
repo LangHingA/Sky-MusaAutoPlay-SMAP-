@@ -16,7 +16,7 @@ public sealed class ReleaseCandidateVersionTests
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         { Requests++; return Task.FromResult(response(request)); }
     }
-    const string Asset = "https://github.com/lingyunalingyun/Sky-MusaAutoPlay-SMAP-/releases/download/v3.0.0/SMAP-Setup.exe";
+    const string Asset = "https://github.com/langhinga/Sky-MusaAutoPlay-SMAP-/releases/download/v3.0.0/SMAP-Setup.exe";
     [Theory]
     [InlineData("3.0.0", "3.0.0-rc.1", 1)]
     [InlineData("3.0.0-rc.2", "3.0.0-rc.1", 1)]
@@ -39,7 +39,7 @@ public sealed class ReleaseCandidateVersionTests
         Assert.Equal(data,File.ReadAllBytes(path));Assert.False(File.Exists(path+".download"));Assert.Equal(1,reply.Requests);
     }
     [Theory]
-    [InlineData("http://github.com/lingyunalingyun/Sky-MusaAutoPlay-SMAP-/releases/download/v3.0.0/SMAP-Setup.exe")]
+    [InlineData("http://github.com/langhinga/Sky-MusaAutoPlay-SMAP-/releases/download/v3.0.0/SMAP-Setup.exe")]
     [InlineData("https://foreign.invalid/SMAP-Setup.exe")]
     public async Task UntrustedInitialAddressIsRejectedBeforeNetwork(string asset)
     {
