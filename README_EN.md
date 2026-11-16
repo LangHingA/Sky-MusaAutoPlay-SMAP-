@@ -14,12 +14,10 @@ An auto-play (auto-piano) helper for **Sky: Children of the Light** — reimagin
 
 ## Overview
 
-Developed by **LANGHINGA**. This delivery is **v3.0.0 Stable**. Release artifacts are prepared with the final version; this README and the release notes await user review before public release.
-
 SMAP plays Sky's instruments for you: import or create a sheet, and it performs it in-game.
 The latest release is a **full C# WPF rewrite** with a **music-player UI** — an account + collections sidebar, a cover-art library in the middle, the virtual keys on the right, and a full-width player bar at the bottom, plus a play queue, an inline cloud library, and a settings view.
 
-> 🎼 **v3.0.0**: native `.smap` multi-track projects, Tap/Hold, tempo and meter changes, four import tabs, Muse versioned sharing, image-score recovery, announcements and signed background differential updates. Legacy migration keeps original files; songs are grouped in `Song/` beside the program.
+> 🎼 **v3.0.0**: native `.smap` multi-track projects, Tap/Hold, tempo and meter changes, image-score recovery, four unified import tabs, Muse sharing, announcements and background differential updates.
 
 > 🍬 **v2.2 "YunYun"**: Practice now includes a **sheet wall, beat mode, and Game Practice** with an always-on-top window and global key listening while Sky has focus; global playback hotkeys have been redesigned; adds sheet-cover upload/display, website account avatars, and the new "Sunset Candy" theme; dropdowns and favorites gain nonlinear motion; updates can now download, install, and restart entirely in-app.
 
@@ -31,7 +29,7 @@ The latest release is a **full C# WPF rewrite** with a **music-player UI** — a
 
 ## Screenshots
 
-The original screenshots are retained to show the visual style. Import, sharing and update screens have changed in v3.0.
+These are the original v2.2 screenshots. Import, sharing and settings have changed in v3.0.
 
 | Dark · Local library (Chinese) | Light · Cloud library (English) |
 |:---:|:---:|
@@ -62,27 +60,26 @@ The original screenshots are retained to show the visual style. Import, sharing 
 - **Local library** — rich rows with cover art (title / artist / transcriber / duration); hover reveals add-to-queue / favorite / more; right-click menu with 7 actions (add to queue / add to collection / remove from library / open file location / edit / song info / upload).
 - **My Collections (playlists)** — create / rename / delete / **drag to reorder** (with a drop indicator); the ⭐ star means "saved in any collection" (music-player style).
 - **Inline cloud library** — browse the MuseTreehouse online library right in the middle pane, with **infinite scroll**, sort (newest / hottest / downloads) + difficulty filter, one-click download, and sheet-cover upload/display.
-- **Unified import** — four tabs for online SMAP sharing, offline, TXT/JSON and MIDI; native `.smap` projects and legacy sheets are supported.
-- **Online sharing** — Muse HTTPS publishing and downloads, immutable version codes, history and provenance. Publishers and authorized managers can edit song information; the server authorizes management operations.
-- **Legacy protection** — metadata-only edits preserve notes, key counts, time units and valid extension fields without rewriting other songs in a multi-song file.
+- **Unified import** — four tabs for online SMAP codes, offline, TXT/JSON and MIDI; native `.smap` projects and legacy sheets are supported.
+- **Online sharing** — publish selected tracks with cover, artist/composer, transcriber, difficulty, tags and description; fixed version codes support downloads, project recovery, history and provenance. Publishers and authorized managers can edit song information.
+- **Legacy compatibility** — TXT/JSON sheets convert automatically for sharing; metadata-only edits preserve notes, 4/8/15-key layouts, time units and extension fields.
 
 ### Authoring & Sound
-- **Piano-roll editor** — native `.smap` multi-track projects, Tap/Hold notes, tempo and meter changes, keyboard entry, triplet grid, undo/redo and continued editing.
-- **Professional image scores** — SVG/PNG export and project recovery using the existing recovery protocol.
-- **Version boundary** — in-game score mapping remains deferred to v3.1 and is not enabled.
+- **Piano-roll editor** — multi-track `.smap` projects, Tap/Hold, tempo and meter changes, keyboard entry, triplet grid and undo/redo.
+- **Image scores** — professional SVG/PNG export with project recovery for continued editing.
 - **Cave reverb** — recreates Sky's cave acoustics.
 - **Instruments** — **37 of them**, including 27 original Sky timbres extracted from the game (Violin / Cello / Saxophone / Ocarina / Harmonica / Pipa / Glockenspiel / Handpan / Horn / Piccolo… etc.), names localized per language.
 - **Per-instrument transpose** — independent pitch offset per instrument (12 semitones + octaves), saved locally; low instruments default to their in-game register, one-click reset.
 - **Hold to sustain** — wind / bowed-string instruments sound continuously while a key is held.
 
 ### UI & Settings
-- **G2 continuous rounded controls and custom window** + **live Dark / Light / Sunset Candy themes** + **Sky-style diamond keys** (with a flip animation on trigger).
+- **G2 continuous rounded window and controls** + **live Dark / Light / Sunset Candy themes** + **Sky-style diamond keys** (with a flip animation on trigger).
 - **Website account profile** — shows the MuseTreehouse avatar directly in the sidebar card and profile window.
 - **Polished motion** — interruptible nonlinear animations for filter/sort popups, favorite stars, and practice transitions.
 - **Languages** — Simplified Chinese / Traditional Chinese / English / Japanese.
 - **Settings view** (slides in from the middle/right panels) — language / theme / check updates / upload logs / UI scale / font scale / start countdown / key mapping.
-- **Announcements** — view Muse-managed announcements, details and unread state in Settings.
-- **Auto-requests admin** on launch + **automatic update check**. Select the stable or test channel in Settings; a small pill announces background downloading, and a separate prompt offers restart when ready. The running program is not replaced immediately.
+- **Announcements** — view Muse-managed announcements, details and unread status in Settings.
+- **Auto-requests admin** on launch + **automatic update check**; choose stable or test releases. A small pill announces background differential downloading, followed by a restart prompt when ready, without interrupting current use.
 
 ## Shortcuts
 
@@ -107,42 +104,27 @@ The original screenshots are retained to show the visual style. Import, sharing 
 
 ## Install / Use
 
-1. Download **SMAP-Setup.exe** for the desired version from [Releases](https://github.com/langhinga/Sky-MusaAutoPlay-SMAP-/releases). v3.0.0 uses the stable update channel; the test channel is reserved for subsequent prereleases.
+1. Download the latest **SMAP-Setup.exe** from [Releases](https://github.com/langhinga/Sky-MusaAutoPlay-SMAP-/releases).
 2. Run it (it requests admin rights), pick an install path in the wizard; desktop / Start-menu shortcuts are created automatically.
 3. Take out an instrument in-game → double-click a song in SMAP to enqueue → press the bottom ▶ or `F1` in-game.
 
-> Downloaded and imported songs default to `Song/` beside the program. This version does not offer a storage-location setting. Existing settings, favorites and private sessions remain in `%APPDATA%/SMAP/`.
+> Downloaded and imported sheets default to `Song` next to the app; storage-location selection is not available in this version. Legacy `songs` and previous AppData libraries are copied, verified and remapped. Originals remain: verify songs and favorites before cleaning old directories.
 > For a bulk sheet library, see the [`曲谱库/`](曲谱库/) folder in this repo.
 
-Migration from legacy `songs/` and the previous `%LOCALAPPDATA%/SMAP/Songs/` location copies files, verifies SHA-256 and remaps known references. Originals remain, and name conflicts are not silently overwritten. Verify songs, favorites and sharing associations before cleaning old directories. Do not install into the personal-data directory itself.
+Regular installations keep settings and account data in `%APPDATA%/SMAP/`. For portable use, create `portable.mode` next to the app: settings and caches go into `Data/`, while songs remain in `Song/`. Existing account data is not automatically imported into a new portable profile. Updates preserve personal songs and settings.
 
-Portable mode requires an explicit `portable.mode` file next to the program and stores settings, caches and update staging in `Data/`; songs remain in `Song/` beside the program. An old `songs/` directory alone never enables it; regular-profile credentials are not automatically exported.
-
-The compact program directory primarily contains `SMAP.exe`, `SMAP.Updater.exe`, `Assets/`, `Licenses/`, the user library `Song/` and a signed installed manifest. Caches, update staging and backups live under `%LOCALAPPDATA%/SMAP/`. Updates preserve personal songs and settings; program rollback does not roll back user data.
+> In-game score mapping remains deferred to v3.1.
 
 ## Build from source
 
 Requires Windows and [.NET SDK 10.0.403](https://dotnet.microsoft.com/download), as pinned in [global.json](global.json).
 
-```powershell
-dotnet build SMAP.slnx -c Debug
-dotnet build SMAP.slnx -c Release
-dotnet test Tests/SMAP.Tests.csproj -c Debug
-dotnet test Tests/SMAP.Tests.csproj -c Release
-./Installer/build-installer.ps1 -Dotnet 'C:/Program Files/dotnet/dotnet.exe' -OutputRoot 'C:/SMAP-build'
-```
+    dotnet build SMAP.slnx -c Release
+    dotnet test Tests/SMAP.Tests.csproj -c Release
 
-The main project is in `src/SMAP.WPF/`, grouped into Views, Controls, Core, Services and Updates. `Installer/`, `Updater/`, `Tests/` and `Tools/` have separate responsibilities. Packaging produces `_smap_publish/`, `Payload/app.zip` and `_setup_out/SMAP-Setup.exe`; Windows x64 installers include the runtime.
+The main project is in `src/SMAP.WPF/`; installer and updater projects are in `Installer/` and `Updater/`. Windows x64 packages include the runtime, using single-file executables and grouped resources.
 
-Build and isolated-test temporary storage must stay within **5 GB (5,000,000,000 bytes) combined**. Set `SMAP_BUILD_SCRATCH_ROOT` to one F-drive development scratch directory and run `Tools/CheckBuildStorage.ps1` with a reservation for the next operation. Installer packaging checks this budget. Never delete user data or recovery backups to make room.
-
-## Update and release trust
-
-The source branches are main for stable and beta for testing. The client discovers GitHub Releases: stable releases for the stable channel, prereleases for testing. Alpha and Stable use independent P-256 signing identities. Never include private keys in Git or release assets. Updates require valid manifest signatures and content SHA-256 checks; automatic full-installer updates also require trusted signed release metadata.
-
-RC.4 to RC.5 passed real GitHub HTTPS differential download, verification, reconstruction and user-confirmed restart acceptance. This does not establish an online Stable-to-Stable test. Windows Authenticode is not configured; signed update metadata is distinct from a Windows publisher certificate. Real game performance and human listening require separate acceptance.
-
-The v3.0.0 release documentation awaits user review. See the [release notes draft](docs/RELEASE-NOTES-v3.0-DRAFT.md).
+Installer packaging lives in [`Installer/`](Installer/) (`build-installer.ps1`).
 
 ## Old JavaFX build
 
@@ -150,4 +132,4 @@ No longer maintained; source in [`legacy/JavaFX/`](legacy/JavaFX/).
 
 ## License
 
-See [LICENSE](LICENSE) and [third-party notices](docs/ThirdPartyNotices.txt). For study/hobby use; sheet copyrights belong to their transcribers.
+See [LICENSE](LICENSE). For study/hobby use; sheet copyrights belong to their transcribers. Developed by **LANGHINGA**. See [third-party notices](docs/ThirdPartyNotices.txt).
