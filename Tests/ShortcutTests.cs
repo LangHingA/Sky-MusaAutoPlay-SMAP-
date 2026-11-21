@@ -6,10 +6,25 @@ namespace SMAP.Tests;
 
 public class ShortcutTests
 {
+    [Theory] [InlineData(false)] [InlineData(true)]
+    public void StartupConflictKeepsOtherKeysAndCanRetry(bool nativeError)
+    {
+        var r = new Registrar { FailKey = 0x74, NativeError = nativeError };
+        using var registrations = new ShortcutRegistrations(r);
+        Assert.Throws<AggregateException>(() => registrations.Apply(ShortcutRules.Defaults(), tolerateConflicts:true));
+        Assert.Equal(7, r.Active.Count);
+        Assert.Contains(new ShortcutChord(0x70), registrations.Registered.Keys);
+        Assert.Contains(new ShortcutChord(0x27), registrations.Registered.Keys);
+        r.FailKey = null;
+        registrations.Apply(ShortcutRules.Defaults(), tolerateConflicts:true);
+        Assert.Equal(8, r.Active.Count);
+        registrations.Apply(ShortcutRules.Defaults(), true, true);
+        Assert.Empty(r.Active);
+    }
     sealed class Registrar : IShortcutRegistrar
     {
-        public Dictionary<int, ShortcutChord> Active = new(); public int? FailKey;
-        public bool Register(int id, ShortcutChord chord) { if (chord.Key == FailKey) return false; return Active.TryAdd(id, chord); }
+        public Dictionary<int, ShortcutChord> Active = new(); public int? FailKey; public bool NativeError;
+        public bool Register(int id, ShortcutChord chord) { if (chord.Key == FailKey) { if(NativeError)throw new System.ComponentModel.Win32Exception(1409); return false; } return Active.TryAdd(id, chord); }
         public bool Unregister(int id) => Active.Remove(id);
     }
     [Fact] public void DefaultsKeepAllEightExistingBindings()

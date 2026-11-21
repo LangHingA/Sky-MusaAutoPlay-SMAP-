@@ -56,17 +56,28 @@ public sealed class ShortcutRegistrations(IShortcutRegistrar registrar) : IDispo
     readonly Dictionary<ShortcutChord, int> _registered = new();
     int _next = 1200;
     public IReadOnlyDictionary<ShortcutChord, int> Registered => _registered;
-    public void Apply(IEnumerable<FunctionShortcut> settings, bool mapping = false)
+    public void Apply(IEnumerable<FunctionShortcut> settings, bool mapping = false, bool tolerateConflicts = false)
     {
         var required = settings.Where(s => FeatureAvailability.ShortcutAvailable(s.Action) && !mapping && s.Scope == ShortcutScope.Global && s.Chord != null).Select(s => s.Chord!.Value).ToHashSet();
         var added = new Dictionary<ShortcutChord, int>(); var removed = new Dictionary<ShortcutChord, int>();
+        var conflicts = new List<Exception>();
         try
         {
             foreach (var chord in required.Except(_registered.Keys))
             {
                 do { _next=_next>=0xBFFF?1200:_next+1; } while(_registered.Values.Contains(_next)||added.Values.Contains(_next));
                 int id=_next;
-                if (!registrar.Register(id, chord)) throw new InvalidOperationException("ShortcutRegistrationFailed");
+                try
+                {
+                    if (!registrar.Register(id, chord))
+                    {
+                        var error = new InvalidOperationException($"ShortcutRegistrationFailed: {chord}");
+                        if (!tolerateConflicts) throw error;
+                        conflicts.Add(error); continue;
+                    }
+                }
+                catch (System.ComponentModel.Win32Exception error) when (tolerateConflicts && error.NativeErrorCode == 1409)
+                { conflicts.Add(error); continue; }
                 added.Add(chord, id);
             }
             foreach (var pair in _registered.Where(p => !required.Contains(p.Key)))
@@ -85,6 +96,7 @@ public sealed class ShortcutRegistrations(IShortcutRegistrar registrar) : IDispo
         }
         foreach (var p in removed) _registered.Remove(p.Key);
         foreach (var p in added) _registered.Add(p.Key, p.Value);
+        if (conflicts.Count != 0) throw new AggregateException("Some shortcuts are already in use; other shortcuts remain active.", conflicts);
     }
     public void Dispose()
     {

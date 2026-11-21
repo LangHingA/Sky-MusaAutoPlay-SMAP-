@@ -57,7 +57,7 @@ public partial class MainWindow
         bool focused=EditorForeground(foreground)||AppForeground(foreground)&&TextInputFocused;
         if(focused==_textInputSuspended)return;_textInputSuspended=focused;
         _shortcuts.Clear();
-        try{_registrations?.Apply(_inputs.Functions,_mapping!=null||_inputSettingsOpen||focused);}
+        try{_registrations?.Apply(_inputs.Functions,_mapping!=null||_inputSettingsOpen||focused,tolerateConflicts:true);}
         catch(Exception error){Logger.Exception("快捷键焦点路由更新失败",error);ShowToast(Lang.S("map.applyFailed"));}
     }
     void RestorePerformanceBindings()
@@ -79,7 +79,7 @@ public partial class MainWindow
     internal void InitializeInputRouting(IShortcutRegistrar? registrar=null,IKeyboardObserver? observer=null)
     {
         _shortcuts.Settings=_inputs.Functions.ToList();_shortcuts.PerformanceKeys=_inputs.AllPerformanceKeys(_player.Vk).ToHashSet();_registrations=new(registrar??new Registrar(_hwnd));
-        try{_registrations.Apply(_shortcuts.Settings);}
+        try{_registrations.Apply(_shortcuts.Settings,tolerateConflicts:true);}
         catch(Exception error){Logger.Exception("快捷键注册失败",error);ShowToast(Lang.S("map.applyFailed"));}
         try{_observer=observer??new GlobalKeyboardObserver();_observer.Key+=ObservedInput;_observer.Overflow+=InputOverflow;}
         catch(Exception error){Logger.Exception("键盘监听启动失败",error);ShowToast(Lang.S("map.applyFailed"));}
@@ -183,7 +183,7 @@ public partial class MainWindow
                 if(active)try{_registrations?.Apply(_inputs.Functions,true);}catch(Exception ex){Logger.Exception("快捷键录入准备失败",ex);}
             }){Owner=this}.ShowDialog();
         }
-        finally{_inputSettingsOpen=false;_shortcuts.Capturing=false;try{_registrations?.Apply(_inputs.Functions,_mapping!=null);}catch(Exception ex){Logger.Exception("快捷键恢复失败",ex);ShowToast(Lang.S("map.applyFailed"));}}
+        finally{_inputSettingsOpen=false;_shortcuts.Capturing=false;try{_registrations?.Apply(_inputs.Functions,_mapping!=null,tolerateConflicts:true);}catch(Exception ex){Logger.Exception("快捷键恢复失败",ex);ShowToast(Lang.S("map.applyFailed"));}}
     }
     bool ApplyInputPreferences(InputPreferences next)
     {
@@ -192,7 +192,7 @@ public partial class MainWindow
         try
         {
             _registrations?.Apply(next.Functions,_mapping!=null);
-            try{next.Save();}catch{_registrations?.Apply(_inputs.Functions,_mapping!=null);throw;}
+            try{next.Save();}catch{_registrations?.Apply(_inputs.Functions,_mapping!=null,tolerateConflicts:true);throw;}
             _inputs=next;_shortcuts.Settings=next.Functions.ToList();RestorePerformanceBindings();
             _shortcuts.PerformanceKeys=next.AllPerformanceKeys(_player.Vk).ToHashSet();_shortcuts.Clear();
             for(int i=0;i<15;i++)RefreshKey(i);
@@ -200,7 +200,7 @@ public partial class MainWindow
         }
         catch(Exception ex)
         {
-            bool restored=true;try{_registrations?.Apply(_inputs.Functions,_mapping!=null);}catch(Exception rollback){restored=false;ex=new AggregateException(ex,rollback);}
+            bool restored=true;try{_registrations?.Apply(_inputs.Functions,_mapping!=null,tolerateConflicts:true);}catch(Exception rollback){restored=false;ex=new AggregateException(ex,rollback);}
             Logger.Exception("快捷键配置应用失败",ex);MsgBox.Info(this,Lang.S(restored?"map.applyFailed":"map.rollbackFailed")+"\n"+ex.Message,Lang.S("map.shortcuts"));return false;
         }
     }
@@ -224,10 +224,10 @@ public partial class MainWindow
                 project=new(){Tracks=new(){t}};
             }
             _mapping=new(project,c=>_inputs.For(c,_player.Vk),name=>_inputs.Capability(name));
-            _mapping.Closed+=(_,_)=>{_mapping=null;_shortcuts.Clear();try{_registrations?.Apply(_inputs.Functions);}catch(Exception ex){Logger.Exception("快捷键恢复失败",ex);ShowToast(Lang.S("map.applyFailed"));}};
+            _mapping.Closed+=(_,_)=>{_mapping=null;_shortcuts.Clear();try{_registrations?.Apply(_inputs.Functions,tolerateConflicts:true);}catch(Exception ex){Logger.Exception("快捷键恢复失败",ex);ShowToast(Lang.S("map.applyFailed"));}};
             _mapping.Show();
         }
-        catch(Exception ex){_mapping=null;try{_registrations?.Apply(_inputs.Functions);}catch(Exception rollback){ex=new AggregateException(ex,rollback);}
+        catch(Exception ex){_mapping=null;try{_registrations?.Apply(_inputs.Functions,tolerateConflicts:true);}catch(Exception rollback){ex=new AggregateException(ex,rollback);}
             Logger.Exception("谱面映射启动失败",ex);ShowToast(Lang.S("map.applyFailed"));}
     }
     InstrumentCapability? PreviewCapability=>_inputs.Capability(_instrumentName);
